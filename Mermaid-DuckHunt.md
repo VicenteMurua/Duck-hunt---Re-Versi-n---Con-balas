@@ -28,6 +28,7 @@ flowchart TD
     Se agregará sección de dificultad, explicación de ellas
     Se pondrá selección de volumen global, sonido previo para comparar escucha, rotador de sonidos aleatorios
     Boton para volver al menú
+    Tengo que hacer un metodo actualizar sonido
 
     PANTALLA DE JUEGO
     Indicador de nivel de dificultad

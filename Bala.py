@@ -1,8 +1,8 @@
 import time
 from mblock import event
 
-@event.greenflag
-def on_greenflag():
+@event.received('Juego')
+def on_received():
     sprite.set_draggable(False)
     sprite.x = 0
     sprite.y = -180
@@ -10,8 +10,8 @@ def on_greenflag():
     sprite.set_variable('Bandera de disparo', 0)
 
 
-@event.greenflag
-def on_greenflag1():
+@event.received('Juego')
+def on_received1():
     # not supported yet
     # not supported yet
     # not supported yet
@@ -35,9 +35,10 @@ time.sleep(0.5)
 
 # not supported yet
 sprite.show()
+sprite.play('Tennis Hit')
 sprite.glide(sprite.get_variable('Posición x de disparo'), sprite.get_variable('Posición y de disparo'), 0.25)
 sprite.set_variable('Bandera de disparo', 1)
-time.sleep(0.2)
+time.sleep(0.1)
 sprite.set_variable('Bandera de disparo', 0)
 # not supported yet
 

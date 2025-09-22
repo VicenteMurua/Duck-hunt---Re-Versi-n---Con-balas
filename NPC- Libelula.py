@@ -1,29 +1,10 @@
-from mblock import event
 import random
 import math
 import time
+from mblock import event
 
 Cuadrado_de_la_distancia_de_libelula_final_eje_x = 0
 Cuadrado_de_la_distancia_de_libelula_final_eje_y = 0
-
-@event.greenflag
-def on_greenflag():
-    global Cuadrado_de_la_distancia_de_libelula_final_eje_x, Cuadrado_de_la_distancia_de_libelula_final_eje_y
-    sprite.set_variable('Distancia de libelula-final eje x', 0)
-    sprite.set_variable('Distancia de libelula-final eje y', 0)
-    Cuadrado_de_la_distancia_de_libelula_final_eje_x = 0
-    Cuadrado_de_la_distancia_de_libelula_final_eje_y = 0
-    # not supported yet
-    # not supported yet
-    # not supported yet
-    # not supported yet
-    sprite.set_variable('Destino aleatorio en eje x de libelula', 0)
-    sprite.set_variable('Distancia vectorial', 100)
-    sprite.set_variable('Dirección final de libelula', 0)
-    # not supported yet
-    # not supported yet
-    # not supported yet
-
 
 def Movimiento_de_libelulas():
     global Cuadrado_de_la_distancia_de_libelula_final_eje_x, Cuadrado_de_la_distancia_de_libelula_final_eje_y
@@ -47,7 +28,7 @@ def Movimiento_de_libelulas():
             sprite.direction = sprite.get_variable('Dirección final de libelula')
 
 
-    sprite.glide(sprite.get_variable('Destino aleatorio en eje x de libelula'), sprite.get_variable('Tope Vertical'), 4 / sprite.get_variable('Dificultad'))
+    sprite.glide(sprite.get_variable('Destino aleatorio en eje x de libelula'), sprite.get_variable('Tope Vertical'), 8 / sprite.get_variable('Dificultad'))
 
 
 def Generador_de_libelulas():
@@ -55,17 +36,68 @@ def Generador_de_libelulas():
     while True:
         time.sleep(0.5)
         sprite.clone('_myself_')
+        if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
+            sprite.stop_this()
+
 
 
 
 @event.greenflag
-def on_greenflag1():
+def on_greenflag():
     global Cuadrado_de_la_distancia_de_libelula_final_eje_x, Cuadrado_de_la_distancia_de_libelula_final_eje_y
+    sprite.set_costume('Libelula')
+    sprite.x = 0
+    sprite.y = 180
     sprite.hide()
+
+
+@event.received('Juego')
+def on_received():
+    global Cuadrado_de_la_distancia_de_libelula_final_eje_x, Cuadrado_de_la_distancia_de_libelula_final_eje_y
     Generador_de_libelulas()
 
 
+@event.received('Juego')
+def on_received1():
+    global Cuadrado_de_la_distancia_de_libelula_final_eje_x, Cuadrado_de_la_distancia_de_libelula_final_eje_y
+    sprite.set_variable('Distancia de libelula-final eje x', 0)
+    sprite.set_variable('Distancia de libelula-final eje y', 0)
+    Cuadrado_de_la_distancia_de_libelula_final_eje_x = 0
+    Cuadrado_de_la_distancia_de_libelula_final_eje_y = 0
+    # not supported yet
+    # not supported yet
+    # not supported yet
+    # not supported yet
+    sprite.set_variable('Destino aleatorio en eje x de libelula', 0)
+    sprite.set_variable('Distancia vectorial', 100)
+    sprite.set_variable('Dirección final de libelula', 0)
+    # not supported yet
+    # not supported yet
+    # not supported yet
 
+
+
+
+
+
+
+
+# not supported yet
+sprite.set_variable('Distancia de libelula-final eje x', ((sprite.get_property('Bala', 'x') - sprite.x)))
+Cuadrado_de_la_distancia_de_libelula_final_eje_x = sprite.get_variable('Distancia de libelula-final eje x') * sprite.get_variable('Distancia de libelula-final eje x')
+sprite.set_variable('Distancia de libelula-final eje y', ((sprite.get_property('Bala', 'y') - sprite.y)))
+Cuadrado_de_la_distancia_de_libelula_final_eje_y = sprite.get_variable('Distancia de libelula-final eje y') * sprite.get_variable('Distancia de libelula-final eje y')
+sprite.set_variable('Distancia vectorial', math.sqrt((Cuadrado_de_la_distancia_de_libelula_final_eje_x + Cuadrado_de_la_distancia_de_libelula_final_eje_y)))
+while True:
+    if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
+        # not supported yet
+
+    if sprite.get_variable('Bandera de disparo') == 1:
+        if sprite.touching('Bala') or sprite.get_variable('Distancia vectorial') < 5:
+            v = sprite.get_variable('Puntos')
+            sprite.set_variable('Puntos', v + 5)
+            sprite.play('Low Whoosh')
+            # not supported yet
 
 
 
@@ -74,22 +106,22 @@ def on_greenflag1():
 Movimiento_de_libelulas()
 # not supported yet
 
-# Control para evitar sobrecreación
 # not supported yet
 time.sleep(5)
 # not supported yet
 
 # not supported yet
-sprite.set_variable('Distancia de libelula-final eje x', ((sprite.get_property('Bala', 'x') - sprite.x)))
-Cuadrado_de_la_distancia_de_libelula_final_eje_x = sprite.get_variable('Distancia de libelula-final eje x') * sprite.get_variable('Distancia de libelula-final eje x')
-sprite.set_variable('Distancia de libelula-final eje y', ((sprite.get_property('Bala', 'y') - sprite.y)))
-Cuadrado_de_la_distancia_de_libelula_final_eje_y = sprite.get_variable('Distancia de libelula-final eje y') * sprite.get_variable('Distancia de libelula-final eje y')
-# Raiz de los cuadrados de la suma de coordenadas
-# Distancia del modulo del vector de distancia
-sprite.set_variable('Distancia vectorial', math.sqrt((Cuadrado_de_la_distancia_de_libelula_final_eje_x + Cuadrado_de_la_distancia_de_libelula_final_eje_y)))
+sprite.size = 30
 while True:
-    if sprite.get_variable('Bandera de disparo') == 1:
-        if sprite.touching('Bala') or sprite.get_variable('Distancia vectorial') < 1:
-            v = sprite.get_variable('Puntos')
-            sprite.set_variable('Puntos', v + 10)
-            # not supported yet
+    sprite.set_costume('Libelula')
+    time.sleep(0.01)
+    sprite.set_costume('Libelula - Medio')
+    time.sleep(0.01)
+    sprite.set_costume('Libelula - Abajo')
+    time.sleep(0.01)
+    sprite.set_costume('Libelula - Medio')
+    time.sleep(0.01)
+    sprite.set_costume('Libelula')
+    time.sleep(0.01)
+    sprite.set_costume('Libelula - Arriba')
+    time.sleep(0.01)
