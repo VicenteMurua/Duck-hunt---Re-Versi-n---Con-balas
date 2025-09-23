@@ -105,32 +105,14 @@ flowchart TD
     Mensaje de puntaje final
     Estadísticas rápidas (aciertos, fallos, precisión).
 # To-Do
-## Sprite - Mira
-### Que hace?
-- Gira
-- Se actualiza para diferentes espacios
-    - Inicio:
-        - Se muestra
-        - Detiene los otros procesos
-        - Se transforma en estrella
-        - Sigue al mouse
-        - Gira
-    - Opciones: No es necesario mismo comportamiento de inicio y opciones depende de inicio
-    - Juego:
-        - Apunta en dirección correcta, porque antes estaba girando
-        - Se muestra
-        - Detiene los otros procesos
-        - Se transforma en mirilla
-        - Sigue al mouse
-    - Fin
 
 ## NPC - Libelula
 ### Que hace?
-- **Función principal:** El sprite original está oculto y actúa como un "generador" de enemigos.
+- **Función principal:** El sprite original está oculto y actúa como un generador (spawner) de enemigos. También muestra el resumen de bajas en la pantalla final.
 
 - **Generación de clones (Spawning):**
     - Únicamente durante el estado de "Juego", crea una nueva libélula (un clon) cada medio segundo.
-    - Este proceso se detiene si el juego termina o vuelve al inicio.
+    - Lleva un registro de cuántas libélulas se han creado en total (`Creacion de libelulas`).
 
 - **Comportamiento de cada libélula (clon):**
     - **Aparición y movimiento:**
@@ -141,49 +123,90 @@ flowchart TD
     - **Animación:**
         - Aletea constantemente, cambiando entre varios disfraces para simular el vuelo.
     - **Interacción y destrucción:**
-        - Si es tocada por el sprite "Bala", se destruye.
-        - Al ser destruida, añade 5 puntos al marcador y reproduce un sonido.
-        - Los clones también se eliminan si el juego sale del estado "Juego".
+        - Si es tocada por la 'Bala', se destruye.
+        - Al ser destruida, otorga **5 puntos** al marcador.
+        - Incrementa el contador de `Bajas de libelulas`.
+        - Reproduce un sonido (`Low Whoosh`) al ser destruida.
+    - **Decisión de Diseño:** A diferencia de otros enemigos, la Libélula **no resta vidas** si se escapa. Es un objetivo puramente de puntuación.
+    - **Limpieza:**
+        - Todos los clones en pantalla se eliminan si el estado del juego deja de ser "Juego".
+
+- **Resumen de Fin de Partida:**
+    - Al llegar a la pantalla de "Fin", el sprite original se hace visible.
+    - Se posiciona en la pantalla de resumen, inclinado.
+    - Muestra un disfraz de "llorando".
+    - Muestra un mensaje con el recuento final de libélulas abatidas versus las creadas.
 
 ### Que quiero que haga?
-<!-- Aquí puedes anotar tus próximas ideas para este sprite -->
-
-## Arma
+- **(Prioridad)** Añadir un sonido de "zumbido" o similar al momento de la aparición del clon para normalizarlo con los otros NPCs.
+- **(Opcional - Mejora)** Hacer que la frecuencia de aparición de las libélulas dependa de la variable `Dificultad`, para un escalado más coherente.
+## NPC - Buho
 ### Que hace?
-- Al iniciar el programa (bandera verde), el arma permanece oculta.
-- No aparece en las pantallas de "Inicio" ni de "Fin".
-- Su comportamiento principal se activa únicamente durante el "Juego":
-    - Se hace visible.
-    - Sigue la posición del cursor, pero con un desplazamiento fijo (aparece abajo y a la derecha del puntero).
-    - Siempre apunta en la dirección del mouse.
-    - Al hacer clic con el mouse:
-        - Dispara (crea un clon del sprite "Bala").
-        - Realiza una pequeña animación de retroceso inclinándose.
-        - Espera a que se suelte el botón del mouse antes de volver a su posición original.
+- **Función principal:** El sprite original está oculto y actúa como un generador (spawner) de búhos enemigos. También muestra el resumen de bajas en la pantalla final.
 
+- **Generación de clones (Spawning):**
+    - Únicamente durante el estado de "Juego", crea clones de búho en intervalos de tiempo aleatorios.
+    - A mayor nivel de "Dificultad", los búhos aparecen con más frecuencia.
+    - **NUEVO:** Lleva un registro de cuántos búhos se han creado en total (`Creacion de buhos`).
+
+- **Comportamiento de cada búho (clon):**
+    - **Aparición y movimiento:**
+        - Aparece en una posición horizontal aleatoria sobre una "línea de horizonte".
+        - Realiza un "salto" hacia arriba con una velocidad inicial variable, haciéndolos menos predecibles.
+        - Es afectado por una gravedad constante que lo hace acelerar hacia abajo.
+        - Cae hasta desaparecer, momento en el que se autodestruye.
+    - **Animación y Sonido:**
+        - **NUEVO:** Reproduce un sonido de "salto" al aparecer.
+        - **NUEVO:** Cambia de disfraz para reflejar cada fase de su movimiento: salto, caída y una nueva animación de "burla" en el aire (mira a izquierda o derecha) cuando está en el punto más alto de su salto, haciéndolo más expresivo.
+    - **NUEVO - Interacción y destrucción:**
+        - Si es tocado por la 'Bala', se destruye.
+        - Al ser destruido, otorga **10 puntos** al marcador.
+        - Incrementa el contador de `Bajas de buhos`.
+        - Reproduce un sonido de "muerte".
+    - **Limpieza:**
+        - Todos los clones en pantalla se eliminan si el estado del juego deja de ser "Juego".
+
+- **NUEVO - Resumen de Fin de Partida:**
+    - Al llegar a la pantalla de "Fin", el sprite original se hace visible.
+    - Se posiciona en la pantalla de resumen.
+    - Muestra un disfraz de "llorando".
+    - Muestra un mensaje con el recuento final de búhos abatidos versus los creados (ej: "Haz abatido 5 de 12 Buhos").
 ### Que quiero que haga?
 <!-- Aquí puedes anotar tus próximas ideas para este sprite -->
+Si el buho se escapa debe bajar una vida
 
-## Bala
+## NPC - Tucan
 ### Que hace?
-- **Función principal:** El sprite original actúa como una "plantilla" que permanece oculta y fuera de la pantalla durante el juego. La lógica principal se ejecuta en sus clones.
+- **Función principal:** Actúa como un NPC "sagrado" o "amigo". El objetivo del jugador es **NO dispararle**. El sprite original está oculto y gestiona la generación de clones y el resumen final.
 
-- **Comportamiento de cada clon (cuando se dispara):**
-    - **Aparición:**
-        - Se crea en la misma posición que el sprite "Arma".
-        - Apunta en la dirección del mouse en el momento del disparo.
-        - Captura las coordenadas exactas del mouse para usarlas como su destino.
-    - **Trayectoria:**
-        - Se hace visible y reproduce un sonido de disparo.
-        - Se desliza rápidamente (en 0.25 segundos) hasta la posición de destino que capturó.
-        - Mientras viaja, activa una variable ("Bandera de disparo") para que los enemigos sepan que pueden ser impactados.
-    - **Impacto y desaparición:**
-        - Al llegar a su destino, desactiva la "Bandera de disparo".
-        - Entra en un bucle donde su tamaño se reduce progresivamente hasta que desaparece, creando un efecto de impacto.
-        - (El clon se autodestruye después de su animación).
+- **Generación de clones (Spawning):**
+    - Únicamente durante el estado de "Juego", crea un nuevo tucán en intervalos de tiempo aleatorios.
+    - Su frecuencia de aparición y su tamaño inicial dependen de la `Dificultad`.
+    - Lleva un registro de cuántos tucanes se han creado y cuántos han sido "abatidos" por error.
+
+- **Comportamiento de cada tucán (clon):**
+    - **Aparición y Trayectoria:**
+        - Aparece fuera de la pantalla a la izquierda, en una altura aleatoria, y vuela horizontalmente.
+        - Crea un efecto de perspectiva, creciendo en tamaño al entrar en la pantalla.
+    - **Movimiento Vertical y Animación:**
+        - Realiza un movimiento ondulatorio de zig-zag mientras cruza la pantalla.
+        - La animación de las alas está sincronizada con este movimiento.
+    - **Interacción (Penalización):**
+        - Si el jugador le dispara, el tucán se destruye.
+        - Al ser destruido, **penaliza duramente al jugador**: le resta **25 puntos** y le quita **una vida**.
+        - Reproduce un sonido de "cristal roto" para enfatizar el error.
+    - **Limpieza:**
+        - Todos los clones en pantalla se eliminan si el estado del juego deja de ser "Juego".
+
+- **Resumen de Fin de Partida:**
+    - Al llegar a la pantalla de "Fin", el sprite original se hace visible.
+    - Muestra un disfraz de "llorando".
+    - Muestra un mensaje con el recuento de tucanes "abatidos" por error.
 
 ### Que quiero que haga?
-<!-- Aquí puedes anotar tus próximas ideas para este sprite -->
+- **(Prioridad de Gameplay)** Mejorar el patrón de movimiento de zig-zag para que se sienta más natural y menos predecible (usando aleatoriedad o una curva sinusoidal).
+- **(Prioridad de Pulido)** Añadir un sonido distintivo y "amigable" al aparecer, para alertar al jugador de su presencia.
+- **(Mejora Opcional)** Implementar un sistema de **recompensa** (ej: +5 puntos) si el tucán logra cruzar la pantalla sano y salvo, reforzando positivamente el comportamiento deseado.
 
 ## Boton - comenzar
 ### Que hace?
@@ -198,8 +221,8 @@ flowchart TD
 ### Que quiero que haga?
 <!-- Aquí puedes anotar tus próximas ideas para este sprite -->
 
-# To-Do
-## Sprite - Boton - Opciones
+
+## Boton - Opciones
 ### Que hace?
 - Al iniciar el programa (bandera verde), el botón está oculto.
 - Se muestra únicamente en la pantalla de "Inicio".
@@ -232,102 +255,57 @@ Deberia ponerse arriba sin ser clickable cuando entro a opciones y centrarse
 ### Que quiero que haga?
 <!-- Aquí puedes anotar tus próximas ideas para este sprite -->
 
-## Boton - Dificultad
+
+## Fondo
 ### Que hace?
-- **Función principal:** Gestiona el ajuste del nivel de dificultad del juego.
-- **Comportamiento general:**
-    - Solo se muestra en la pantalla de "Opciones". Permanece oculto en todas las demás.
-    - Al aparecer, se divide en dos botones:
-        1.  El sprite original se convierte en el botón para **"Aumentar"** la dificultad y se posiciona a la izquierda.
-        2.  Inmediatamente crea un clon de sí mismo, que se convierte en el botón para **"Disminuir"** la dificultad y se posiciona a la derecha.
-
-- **Funcionalidad de los botones:**
-    - **Botón Aumentar (+):**
-        - Al hacer clic, incrementa la variable "Dificultad" en 1.
-        - El nivel máximo de dificultad es 5. Si se intenta superar, muestra un mensaje de advertencia.
-    - **Botón Disminuir (-):**
-        - Al hacer clic, reduce la variable "Dificultad" en 1.
-        - El nivel mínimo de dificultad es 1. Si se intenta bajar más, muestra un mensaje de advertencia.
-    - **Feedback:** Después de cada cambio, muestra el nuevo valor de dificultad por un momento.
-
-### Que quiero que haga?
-<!-- Aquí puedes anotar tus próximas ideas para este sprite -->
-
-## NPC - Buho
-### Que hace?
-- **Función principal:** El sprite original está oculto y actúa como un generador (spawner) de búhos enemigos.
-
-- **Generación de clones (Spawning):**
-    - Únicamente durante el estado de "Juego", entra en un bucle para crear clones.
-    - El tiempo de espera entre la aparición de cada búho es aleatorio.
-    - A mayor nivel de "Dificultad", menor es el tiempo de espera, haciendo que los búhos aparezcan con más frecuencia.
-    - El proceso de generación se detiene si el juego ya no está en el estado "Juego".
-
-- **Comportamiento de cada búho (clon):**
-    - **Aparición y movimiento:**
-        - Aparece en una posición horizontal aleatoria sobre una "línea de horizonte".
-        - Inmediatamente realiza un "salto" hacia arriba con una velocidad vertical inicial.
-        - Después del salto, es afectado por una gravedad constante que lo hace acelerar hacia abajo.
-        - Cae hasta desaparecer por debajo de la "línea de horizonte", momento en el que se autodestruye.
-    - **Limpieza:**
-        - Si el estado del juego deja de ser "Juego" (por ejemplo, al volver al inicio), todos los clones de búho en pantalla se eliminan.
-
-### Que quiero que haga?
-<!-- Aquí puedes anotar tus próximas ideas para este sprite -->
-Debo agregar colisiones y sonidos
-
-
-## NPC - Tucan
-### Que hace?
-- **Función principal:** El sprite original está oculto y actúa como un generador (spawner) de tucanes.
-
-- **Generación de clones (Spawning):**
-    - Únicamente durante el estado de "Juego", crea un nuevo tucán (clon) en intervalos de tiempo aleatorios.
-    - A mayor nivel de "Dificultad", los tucanes aparecen con más frecuencia.
-    - El proceso se detiene si el juego ya no está en el estado "Juego".
-
-- **Comportamiento de cada tucán (clon):**
-    - **Aparición y Trayectoria:**
-        - Aparece fuera de la pantalla a la izquierda, en una altura aleatoria.
-        - Vuela horizontalmente hacia la derecha a través de la pantalla.
-        - Crea un efecto de perspectiva: empieza pequeño y crece rápidamente al entrar en la pantalla, luego mantiene un tamaño fijo.
-    - **Movimiento Vertical y Animación:**
-        - Una vez en pantalla, realiza un movimiento ondulatorio o de zig-zag: aletea para subir un poco y luego planea hacia abajo una distancia mayor.
-        - La animación de las alas (cambio de disfraz) está sincronizada con este movimiento.
-    - **Interacción:**
-        - Actualmente, solo implementa la lógica de movimiento. **No tiene colisiones** con la 'Bala' ni otorga puntos.
-        - Se autodestruye si vuela fuera del borde derecho de la pantalla o si el juego termina.
-
-### Que quiero que haga?
-- Implementar la lógica de colisión para que pueda ser destruido por la 'Bala'.
-- Añadir la funcionalidad de otorgar puntos al ser destruido.
-- **(Prioridad)** Reemplazar el actual movimiento de zig-zag por un sistema de 'saltos' y gravedad, similar al del Búho, para un movimiento más físico y menos predecible.
-
-## Fondo (Stage)
-### Que hace?
-- **Función principal:** Actúa como el controlador central del juego, gestionando los diferentes estados (pantallas) y la lógica principal de la partida.
+- **Función principal:** Sigue actuando como el **controlador central del juego**, gestionando los estados, variables globales y la lógica principal de la partida.
 
 - **Al iniciar (Bandera Verde):**
-    - Inicializa todas las variables de estado ("Banderas") a cero.
-    - Establece la dificultad por defecto en 1.
+    - Inicializa variables globales clave: `Dificultad` en 1, volumen, y coordenadas para la pantalla de resumen.
     - Lanza el evento "Inicio" para mostrar el menú principal.
 
 - **Gestión de Pantallas:**
     - Recibe eventos ("Inicio", "Opciones", "Juego", "Fin") y cambia la imagen del fondo para que coincida con el estado actual del juego.
 
 - **Lógica del Juego (al recibir "Juego"):**
-    - Inicializa las variables de la partida: define los límites de la pantalla, la línea del horizonte para los enemigos y resetea los puntos a 0.
-    - Inicia un temporizador de 30 segundos.
-    - Monitorea dos condiciones de fin de partida simultáneamente:
-        1.  **Victoria:** Si el jugador alcanza 100 puntos, emite la señal de "Fin".
-        2.  **Derrota:** Si el temporizador llega a 0, emite la señal de "Fin".
-    - Si se sale de la pantalla de juego, estos procesos se detienen.
+    - **Inicialización de la partida:**
+        - Pone a cero los `Puntos`.
+        - **NUEVO:** Establece las `Vidas` del jugador en 3.
+        - Reinicia el `Tiempo Partida`.
+    - **Monitorea Múltiples Condiciones de Fin de Partida:**
+        1.  **Victoria:** Si el jugador alcanza 100 `Puntos`, emite la señal de "Fin".
+        2.  **Derrota por Tiempo:** Si el temporizador `Tiempo Partida` llega a 0, emite la señal de "Fin".
+        3.  **NUEVO - Derrota por Vidas:** Si las `Vidas` del jugador llegan a 0, emite la señal de "Fin".
 
-- **Función sin usar:**
-    - Contiene una función llamada `Reset_de_Estado` que parece diseñada para gestionar o limpiar las variables de estado ("Banderas"), pero actualmente no es llamada por ningún evento.
+- **Pantalla de Fin (al recibir "Fin"):**
+    - **NUEVO - Pantallas de Fin Dinámicas:**
+        - Muestra un fondo específico dependiendo de la causa del final: `Fin - Ganador`, `Fin - 0Tiempo` o `Fin - 0Vidas`.
+        - Reproduce un sonido de victoria solo si se gana por puntos.
+    - **NUEVO - Cálculo de Puntaje Final:**
+        - Calcula un `Puntaje final` complejo que toma en cuenta la Dificultad, los Puntos obtenidos, las Vidas restantes y el tiempo utilizado, premiando la eficiencia.
+    - **NUEVO - Resumen de Estadísticas:**
+        - Prepara la lógica para mostrar un resumen de la partida (ej: "Haz abatido X de Y Búhos").
 
 ### Que quiero que haga?
-<!-- Aquí puedes anotar tus próximas ideas para el Fondo -->
+
+#### 1. Mecánicas de Juego Fundamentales
+
+- [ ] **Sistema de Precisión:**
+    - [ ] Crear variable global `balas_disparadas` e incrementarla al disparar.
+    - [ ] Calcular la precisión (`bajas / disparos`) en la pantalla de `Fin`.
+    - [ ] Mostrar el porcentaje de precisión en el resumen final.
+
+#### 2. Flujo de Juego y Experiencia de Usuario
+
+- [ ] **Pantalla Final (Fin):**
+    - [ ] Añadir un botón funcional de **"Jugar de Nuevo"** que reinicie la partida emitiendo la señal `Juego`.
+- [ ] **Pantallas de Menú:**
+    - [ ] Crear un nuevo fondo (`backdrop`) para las **"Instrucciones"**.
+    - [ ] Añadir un botón en la pantalla de `Inicio` que lleve a las "Instrucciones".
+    - [ ] Añadir un botón en "Instrucciones" para volver a `Inicio`.
+    - [ ] Crear un nuevo fondo (`backdrop`) para los **"Créditos"**.
+    - [ ] Añadir un botón en la pantalla de `Inicio` u `Opciones` que lleve a los "Créd
+    - [ ] Añadir un botón en "Créditos" para volver a `Inicio`.
 
 # Hoja de Ruta del Proyecto
 
@@ -385,3 +363,82 @@ Debo agregar colisiones y sonidos
 #### Mejoras de "Game Feel":
 - **Screen Shake (Sacudida de pantalla):** Cuando un enemigo es destruido, haz que la pantalla tiemble ligeramente por una fracción de segundo. Es un efecto sutil que hace que los impactos se sientan mucho más potentes.
 - **Efecto de "Hit Flash":** Cuando una bala le da a un enemigo, haz que el enemigo parpadee en blanco por un instante antes de desaparecer.
+
+Estoy haciendo funcionar los fondos 
+Se añadieron vidas para  gestionar el otro fondo
+Se me ocurrio un sistema de vidas
+con una variable k que va ir creciendo y la colision de un objeto calavera
+Calculo de score: dificultad*tiempo restante
+
+# Cerrado sin idea de modificar
+## Boton - Dificultad
+### Que hace?
+- **Función principal:** Gestiona el ajuste del nivel de dificultad del juego.
+- **Comportamiento general:**
+    - Solo se muestra en la pantalla de "Opciones". Permanece oculto en todas las demás.
+    - Al aparecer, se divide en dos botones:
+        1.  El sprite original se convierte en el botón para **"Aumentar"** la dificultad y se posiciona a la izquierda.
+        2.  Inmediatamente crea un clon de sí mismo, que se convierte en el botón para **"Disminuir"** la dificultad y se posiciona a la derecha.
+    - **NUEVO:** Se han reposicionado los botones en la parte superior de la pantalla (`y = 70`).
+
+- **Funcionalidad de los botones:**
+    - **Botón Aumentar (+):**
+        - Al hacer clic, incrementa la variable "Dificultad" en 1.
+        - El nivel máximo de dificultad es 5. Si se intenta superar, muestra un mensaje de advertencia.
+    - **Botón Disminuir (-):**
+        - Al hacer clic, reduce la variable "Dificultad" en 1.
+        - El nivel mínimo de dificultad es 1. Si se intenta bajar más, muestra un mensaje de advertencia.
+    - **Feedback:** Después de cada cambio, muestra el nuevo valor de dificultad por un momento.
+
+## Bala
+### Que hace?
+- **Función principal:** El sprite original actúa como una "plantilla" que permanece oculta y fuera de la pantalla. La lógica principal se ejecuta en sus clones.
+- **Decisión de diseño:** Se ha decidido mantener una única arma (pistola) para enfocar el gameplay.
+
+- **Comportamiento de cada clon (cuando se dispara):**
+    - **Aparición:**
+        - Se crea en la misma posición que el sprite "Arma".
+        - Apunta en la dirección del mouse en el momento del disparo.
+        - Captura las coordenadas exactas del mouse para usarlas como su destino.
+    - **Trayectoria:**
+        - Se hace visible y reproduce un sonido de disparo.
+        - Se desliza rápidamente (en 0.25 segundos) hasta la posición de destino que capturó.
+        - **Actualizado:** Activa una variable (`Bandera de disparo`) para que los enemigos puedan registrar el impacto, pero ahora lo hace por un tiempo mucho más corto **(0.05 segundos)**, requiriendo más precisión.
+    - **Impacto y desaparición:**
+        - Al llegar a su destino, desactiva la "Bandera de disparo".
+        - Entra en un bucle donde su tamaño se reduce progresivamente hasta que desaparece, creando un efecto de impacto.
+        - (El clon se autodestruye después de su animación).
+
+## Arma
+### Que hace?
+- Al iniciar el programa (bandera verde), el arma permanece oculta.
+- No aparece en las pantallas de "Inicio" ni de "Fin".
+- Su comportamiento principal se activa únicamente durante el "Juego":
+    - Se hace visible.
+    - **NUEVO:** Se asegura de aparecer siempre en la capa superior (por encima de los enemigos).
+    - Sigue la posición del cursor, pero con un desplazamiento fijo (aparece abajo y a la derecha del puntero).
+    - Siempre apunta en la dirección del mouse.
+    - Al hacer clic con el mouse:
+        - Dispara (crea un clon del sprite "Bala").
+        - Realiza una pequeña animación de retroceso inclinándose.
+        - Espera a que se suelte el botón del mouse antes de volver a su posición original.
+# To-Do
+## Sprite - Mira
+### Que hace?
+- **Función principal:** Actúa como el cursor principal del jugador, cambiando su apariencia y comportamiento según el estado del juego.
+
+- **Comportamiento por estado:**
+    - **En `Inicio` y `Fin` (Menús):**
+        - Se muestra.
+        - Se transforma en una "Estrella".
+        - Sigue continuamente al puntero del mouse.
+        - Gira constantemente, actuando como un cursor decorativo.
+    - **En `Juego` (Partida):**
+        - Se muestra.
+        - Se asegura de apuntar en una dirección fija (90 grados) para evitar rotaciones no deseadas.
+        - Se transforma en una "Mira de Arma" funcional.
+        - Sigue continuamente al puntero del mouse de forma precisa.
+    - **En `Opciones`:**
+        - Hereda el comportamiento de la pantalla de `Inicio`, manteniendo la coherencia del cursor en los menús.
+
+

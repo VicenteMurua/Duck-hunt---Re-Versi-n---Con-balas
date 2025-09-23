@@ -6,7 +6,7 @@ def on_received():
     sprite.show()
     sprite.z_index = 256
     sprite.x = -40
-    sprite.y = -50
+    sprite.y = 70
     sprite.clone('_myself_')
     while True:
         if str('o').find(str(sprite.backdrop_index('name')[0])) > -1:
@@ -40,7 +40,7 @@ def on_received1():
 
 # not supported yet
 sprite.x = 40
-sprite.y = -50
+sprite.y = sprite.y
 sprite.set_costume('Disminuir')
 sprite.show()
 while True:

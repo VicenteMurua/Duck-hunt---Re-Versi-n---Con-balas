@@ -23,6 +23,7 @@ def Animaci_C3_B3n_de_disparo():
 
 def Posicionamiento_de_Arma():
     sprite.show()
+    sprite.z_index = 256
     if str('j').find(str(sprite.backdrop_index('name')[0])) > -1:
         while True:
             sprite.goto('mouse')

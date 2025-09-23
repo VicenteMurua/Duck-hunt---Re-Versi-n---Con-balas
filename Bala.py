@@ -38,7 +38,7 @@ sprite.show()
 sprite.play('Tennis Hit')
 sprite.glide(sprite.get_variable('Posición x de disparo'), sprite.get_variable('Posición y de disparo'), 0.25)
 sprite.set_variable('Bandera de disparo', 1)
-time.sleep(0.1)
+time.sleep(0.05)
 sprite.set_variable('Bandera de disparo', 0)
 # not supported yet
 
