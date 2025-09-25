@@ -52,6 +52,8 @@ def on_received():
     sprite.set_variable('Tiempo Total', 30)
     sprite.set_variable('Tiempo Partida', sprite.get_variable('Tiempo Total'))
     # not supported yet
+    sprite.set_variable('Vidas extra', 0)
+    # not supported yet
 
 
 @event.received('Opciones')
@@ -61,9 +63,14 @@ def on_received1():
 
 @event.received('Juego')
 def on_received2():
+    sprite.set_variable('Balas disparadas', 0)
     sprite.set_variable('Tiempo Partida', sprite.get_variable('Tiempo Total'))
+    # not supported yet
     sprite.set_variable('Puntos', 0)
-    sprite.set_variable('Vidas', 3)
+    # not supported yet
+    # not supported yet
+    sprite.set_variable('Vidas iniciales', 3)
+    sprite.set_variable('Vidas totales', ((sprite.get_variable('Vidas iniciales') + sprite.get_variable('Vidas extra'))))
     sprite.set_variable('Multiplicador de puntaje', 100)
     sprite.set_variable('Puntaje final', 0)
     # not supported yet
@@ -72,7 +79,7 @@ def on_received2():
         if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
             sprite.stop_this()
 
-        if sprite.get_variable('Puntos') > 100 or sprite.get_variable('Puntos') == 100:
+        if sprite.get_variable('Puntos') > 500 or sprite.get_variable('Puntos') == 500:
             sprite.broadcast(str('Fin'))
             sprite.stop_this()
 
@@ -100,7 +107,7 @@ def on_received4():
     sprite.set_backdrop('juego')
     time.sleep(0.1)
     # not supported yet
-    while not (sprite.get_variable('Vidas') < 1 or sprite.get_variable('Vidas') == 0):
+    while not (sprite.get_variable('Vidas totales') < 1 or sprite.get_variable('Vidas totales') == 0):
         if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
             sprite.stop_this()
 
@@ -111,9 +118,9 @@ def on_received4():
 @event.received('Fin')
 def on_received5():
     sprite.set_backdrop('Fin')
-    sprite.set_variable('Puntaje final', (sprite.get_variable('Dificultad') * sprite.get_variable('Multiplicador de puntaje')) * round((((sprite.get_variable('Puntos') + sprite.get_variable('Vidas') * 10)) * ((30 * 100) / ((30 - sprite.get_variable('Tiempo Partida')))))))
+    sprite.set_variable('Puntaje final', (sprite.get_variable('Dificultad') * sprite.get_variable('Multiplicador de puntaje')) * round((((sprite.get_variable('Puntos') + sprite.get_variable('Vidas totales') * 10)) * ((30 * 100) / ((30 - sprite.get_variable('Tiempo Partida')))))))
     time.sleep(0.1)
-    if sprite.get_variable('Puntos') > 100 or sprite.get_variable('Puntos') == 100:
+    if sprite.get_variable('Puntos') > 500 or sprite.get_variable('Puntos') == 500:
         sprite.play('Win')
         sprite.set_backdrop('Fin - Ganador')
         # not supported yet
@@ -122,19 +129,6 @@ def on_received5():
         sprite.set_backdrop('Fin - 0Tienpo')
         # not supported yet
 
-    if 1 > sprite.get_variable('Vidas') or sprite.get_variable('Vidas') == 0:
+    if 1 > sprite.get_variable('Vidas totales') or sprite.get_variable('Vidas totales') == 0:
         sprite.set_backdrop('Fin - 0Vidas')
         # not supported yet
-
-
-
-
-
-
-
-
-
-
-
-
-str(str(str('Haz abatido ') + str(sprite.get_variable('Bajas de buhos'))) + str(str(' de ') + str(sprite.get_variable('Creacion de buhos')))) + str(' Buhos')

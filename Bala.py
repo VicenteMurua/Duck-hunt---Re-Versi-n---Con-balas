@@ -19,6 +19,8 @@ def on_received1():
 
 
 # not supported yet
+v = sprite.get_variable('Balas disparadas')
+sprite.set_variable('Balas disparadas', v + 1)
 sprite.goto('Arma')
 sprite.towards('mouse')
 sprite.size = 70
@@ -34,6 +36,8 @@ time.sleep(0.5)
 
 
 # not supported yet
+v = sprite.get_variable('Balas disparadas')
+sprite.set_variable('Balas disparadas', v + 1)
 sprite.show()
 sprite.play('Tennis Hit')
 sprite.glide(sprite.get_variable('Posición x de disparo'), sprite.get_variable('Posición y de disparo'), 0.25)

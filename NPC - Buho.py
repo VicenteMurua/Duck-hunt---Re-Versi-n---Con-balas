@@ -48,6 +48,10 @@ def Generador_de_gravedad_N(Valor_de_gravedad):
             sprite.y = sprite.y + Velocidad_de_Buho
 
         if sprite.get_variable('Linea de horizonte') > sprite.y:
+            v = sprite.get_variable('Vidas totales')
+            sprite.set_variable('Vidas totales', v + -1)
+            sprite.play('Low Boing')
+            sprite.clone('Sprite - Calavera')
             # not supported yet
 
 
@@ -129,7 +133,7 @@ Generador_de_gravedad_N(-0.4)
 
 # not supported yet
 sprite.set_costume('Buho - Salto')
-sprite.play('Low Boing')
+sprite.play('Owl')
 Direcci_C3_B3n_de_burla = random.randint(0, 1)
 while True:
     if Velocidad_de_Buho < 2:

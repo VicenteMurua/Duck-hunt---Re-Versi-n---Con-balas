@@ -87,6 +87,7 @@ def on_greenflag():
     sprite.set_variable('Bajas de libelulas', 0)
     # not supported yet
     sprite.set_variable('Creacion de libelulas', 0)
+    # not supported yet
 
 
 @event.received('Fin')
@@ -121,47 +122,94 @@ def on_received3():
 
 
 # not supported yet
+sprite.set_variable('Aleatotiedad de libelula', random.randint(1, 25))
+Movimiento_de_libelulas()
+# not supported yet
+
+# not supported yet
 sprite.set_variable('Distancia de libelula-final eje x', ((sprite.get_property('Bala', 'x') - sprite.x)))
 Cuadrado_de_la_distancia_de_libelula_final_eje_x = sprite.get_variable('Distancia de libelula-final eje x') * sprite.get_variable('Distancia de libelula-final eje x')
 sprite.set_variable('Distancia de libelula-final eje y', ((sprite.get_property('Bala', 'y') - sprite.y)))
 Cuadrado_de_la_distancia_de_libelula_final_eje_y = sprite.get_variable('Distancia de libelula-final eje y') * sprite.get_variable('Distancia de libelula-final eje y')
 sprite.set_variable('Distancia vectorial de libelula', math.sqrt((Cuadrado_de_la_distancia_de_libelula_final_eje_x + Cuadrado_de_la_distancia_de_libelula_final_eje_y)))
-while True:
-    if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
-        # not supported yet
-
-    if sprite.get_variable('Bandera de disparo') == 1:
-        if sprite.touching('Bala') or sprite.get_variable('Distancia vectorial de libelula') < 5:
-            v = sprite.get_variable('Puntos')
-            sprite.set_variable('Puntos', v + 5)
-            v = sprite.get_variable('Bajas de libelulas')
-            sprite.set_variable('Bajas de libelulas', v + 1)
-            sprite.play('Low Whoosh')
+if sprite.get_variable('Aleatotiedad de libelula') == 1:
+    while True:
+        if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
             # not supported yet
 
+        if sprite.get_variable('Bandera de disparo') == 1:
+            if sprite.touching('Bala') or sprite.get_variable('Distancia vectorial de libelula') < 5:
+                v = sprite.get_variable('Puntos')
+                sprite.set_variable('Puntos', v + 5)
+                v = sprite.get_variable('Bajas de libelulas')
+                sprite.set_variable('Bajas de libelulas', v + 1)
+                v = sprite.get_variable('Vidas totales')
+                sprite.set_variable('Vidas totales', v + 1)
+                sprite.clone('Sprite - Corazon')
+                sprite.play('Low Whoosh')
+                # not supported yet
+
+
+
+
+else:
+    while True:
+        if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
+            # not supported yet
+
+        if sprite.get_variable('Bandera de disparo') == 1:
+            if sprite.touching('Bala') or sprite.get_variable('Distancia vectorial de libelula') < 5:
+                v = sprite.get_variable('Puntos')
+                sprite.set_variable('Puntos', v + 5)
+                v = sprite.get_variable('Bajas de libelulas')
+                sprite.set_variable('Bajas de libelulas', v + 1)
+                sprite.play('Low Whoosh')
+                # not supported yet
+
+
 
 
 
 # not supported yet
-Movimiento_de_libelulas()
+if sprite.get_variable('Aleatotiedad de libelula') == 1:
+    sprite.play('Magic Spell')
+    sprite.size = 20
+    while True:
+        sprite.set_costume('Libelula - Normal2')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Medio2')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Abajo2')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Medio2')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Normal2')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Arriba2')
+        time.sleep(0.01)
+
+
+else:
+    sprite.size = 30
+    while True:
+        sprite.set_costume('Libelula - Normal')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Medio')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Abajo')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Medio')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Normal')
+        time.sleep(0.01)
+        sprite.set_costume('Libelula - Arriba')
+        time.sleep(0.01)
+
+
+
 # not supported yet
+sprite.play_until_done('Aletear')
 
 # not supported yet
 time.sleep(5)
 # not supported yet
-
-# not supported yet
-sprite.size = 30
-while True:
-    sprite.set_costume('Libelula - Normal')
-    time.sleep(0.01)
-    sprite.set_costume('Libelula - Medio')
-    time.sleep(0.01)
-    sprite.set_costume('Libelula - Abajo')
-    time.sleep(0.01)
-    sprite.set_costume('Libelula - Medio')
-    time.sleep(0.01)
-    sprite.set_costume('Libelula - Normal')
-    time.sleep(0.01)
-    sprite.set_costume('Libelula - Arriba')
-    time.sleep(0.01)

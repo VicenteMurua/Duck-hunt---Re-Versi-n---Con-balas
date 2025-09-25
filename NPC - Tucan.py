@@ -123,6 +123,8 @@ while True:
         else:
             sprite.x = sprite.x + 3
             if sprite.touching('edge') and sprite.x > sprite.get_variable('Tope horizontal'):
+                v = sprite.get_variable('Puntos')
+                sprite.set_variable('Puntos', v + 20)
                 # not supported yet
 
 
@@ -143,9 +145,16 @@ while True:
         if sprite.touching('Bala') or Distancia_vectorial_tucan < 1:
             v = sprite.get_variable('Puntos')
             sprite.set_variable('Puntos', v + -25)
-            v = sprite.get_variable('Vidas')
-            sprite.set_variable('Vidas', v + -1)
+            v = sprite.get_variable('Vidas totales')
+            sprite.set_variable('Vidas totales', v + -1)
             v = sprite.get_variable('Bajas de tucanes')
             sprite.set_variable('Bajas de tucanes', v + 1)
             sprite.play('Glass Breaking')
+            sprite.clone('Sprite - Calavera')
             # not supported yet
+
+
+
+
+if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
+    # not supported yet

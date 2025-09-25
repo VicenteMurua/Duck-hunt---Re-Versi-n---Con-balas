@@ -9,17 +9,22 @@ graph TD
         D -- Click en 'Volver al Inicio' --> B;
         
         subgraph "Bucle de Partida"
-            C1[Fondo inicia temporizador y spawners] --> C2{Jugador interactúa};
-            C2 -- Dispara y acierta --> C3[Puntos++];
-            C2 -- Falla o espera --> C1;
-            C3 --> C4{Tiempo = 0 o Puntos >= 100?};
-            C1 --> C4;
+            C1[Fondo inicia temporizador, vidas y spawners] --> C2{Jugador interactúa};
+            C2 -- Acierta a Búho/Libélula --> C3[Puntos ++];
+            C2 -- Acierta a Tucán (error) --> C4[Puntos -- y Vidas --];
+            C2 -- Búho se escapa --> C4;
+            C2 -- Espera / Falla / Libélula o Tucán se escapan --> C1;
+            
+            C3 --> C5{Condición de Fin?};
+            C4 --> C5;
+            C1 --> C5{Tiempo <= 0, Vidas <= 0 o Puntos >= 500?};
         end
 
         C --> C1;
-        C4 -- Sí --> E[Pantalla: Fin];
+        C5 -- Sí --> E[Pantalla: Fin];
         C -- Click en 'Volver al Inicio' --> B;
         
+        E -- Click en 'Jugar de Nuevo' --> C;
         E -- Click en 'Volver al Inicio' --> B;
     end
 ```
@@ -30,183 +35,151 @@ flowchart TD
         
         subgraph "Gestión de Entorno y NPCs (Proceso Continuo)"
             B -- cada frame --> C[¿Toca generar NPC?];
-            C -- Sí (según timer y dificultad) --> D["Crea Clon de NPC <br> (Libelula, Buho, Tucan)"];
+            C -- Sí (según timer y dificultad) --> D["Crea Clon de NPC <br> (Libélula, Búho, Tucán)"];
             D --> E[El clon ejecuta su IA de movimiento autónomo];
             E --> F{¿NPC colisiona con 'Bala'?};
+            E --> G{¿NPC se escapa?};
             C -- No --> B;
         end
 
         subgraph "Gestión de Acciones del Jugador (Proceso Continuo)"
-            B -- cada frame --> G[Actualiza posición de 'Mira' y 'Arma'];
-            G --> H{¿Jugador hace clic?};
-            H -- Sí --> I[Crea Clon de 'Bala'];
-            I --> J[La 'Bala' ejecuta su trayectoria];
-            J --> K{¿'Bala' colisiona con NPC o sale de pantalla?};
-            H -- No --> B;
+            B -- cada frame --> H[Actualiza 'Mira' y 'Arma'];
+            H --> I{¿Jugador hace clic?};
+            I -- Sí --> J[Crea Clon de 'Bala'];
+            J --> K[La 'Bala' ejecuta su trayectoria];
+            K --> L{¿'Bala' colisiona con NPC?};
+            I -- No --> B;
         end
         
-        subgraph "Resolución de Interacciones y Estado"
-            F -- Sí --> L[<b>Evento de Colisión</b>];
-            K -- Sí --> L;
-            L --> M["+ Incrementar Puntos <br> + Reproducir Sonido <br> + Destruir Clones (Bala y NPC)"];
-            M --> N[Verificar Condición de Fin];
+        subgraph "Resolución de Eventos y Estado"
+            F -- Sí --> M[<b>Evento de Colisión con Bala</b>];
+            L -- Sí --> M;
+            M -- Es Libélula --> N["+ Puntos <br> + Sonido de acierto <br> + Destruir clones"];
+            M -- Es Búho --> N;
+            M -- Es Tucán --> O["- Puntos y -1 Vida <br> + Sonido de error <br> + Crear 'Calavera' <br> + Destruir clones"];
             
-            K -- No --> J;
-            F -- No --> E;
+            G -- Sí (es Búho) --> P["<b>Evento de Escape con Penalización</b>"];
+            P --> Q["-1 Vida <br> + Sonido de error <br> + Crear 'Calavera' <br> + Destruir clon"];
             
-            B --> N;
+            G -- Sí (es Tucán) --> R["<b>Evento de Escape con Recompensa</b>"];
+            R --> S["+ Puntos <br> + Sonido de premio <br> + Destruir clon"];
+            
+            G -- Sí (es Libélula) --> T["<b>Evento de Escape Neutro</b>"];
+            T --> U["Destruir clon"];
+            
+            N --> V[Verificar Condición de Fin];
+            O --> V;
+            Q --> V;
+            S --> V;
+            U --> V;
+            B --> V;
         end
         
-        N{¿Puntos >= 100 o Tiempo <= 0?} -- Sí --> O[Transmitir 'Fin' y terminar bucle];
-        N -- No --> B;
+        V{¿Puntos >= 500, Tiempo <= 0 o Vidas <= 0?} -- Sí --> W[Transmitir 'Fin' y terminar bucles];
+        V -- No --> B;
     end
- ```
+```
 
-    PANTALLA PRINCIPAL
-    Logo o titulo de juego
-    Se agregará boton de jugar
-    Se agregará botón de leer reglas de juego
-    Boton de opciones
-    Autor
-  
-    PANTALLA DE SELECCIÓN DE OPCIONES
-    Se agregará sección de dificultad, explicación de ellas
-    Se pondrá selección de volumen global, sonido previo para comparar escucha, rotador de sonidos aleatorios
-    Boton para volver al menú
-    Tengo que hacer un metodo actualizar sonido
+### ¿Qué ha cambiado en este diagrama?
 
-    PANTALLA DE JUEGO
-    Indicador de nivel de dificultad
-    Contador de puntos animado
-    Timer animado
-    Indicador de vidas
-    Animación de vidas
-    Barra de vidas
-    Se pondra un sonido de vuelo a las libelulas
-    Se pondra un sonido de disparo
-    Se pondra nimacion de golpe y salida de bala
-    Se pondra sonido de muerte de libelula
-    Sonido de fallo de disparo
-    Enemigo al que no dispararle y sus complementos derivados
+1.  **Doble Salida de la IA:** El bloque `E[El clon ejecuta su IA...]` ahora tiene dos posibles salidas: `F[¿Colisiona con 'Bala'?]` y `G[¿Se escapa?]`. Esto es crucial porque tu juego ahora trata ambos eventos de forma diferente.
+2.  **Resolución de Eventos Detallada:** El bloque de "Resolución" es mucho más rico:
+    *   Ya no hay un genérico "Evento de Colisión". Ahora se ramifica según **el tipo de NPC** (`Libélula`, `Búho`, `Tucán`), mostrando las consecuencias únicas de cada colisión.
+    *   Se ha añadido toda una nueva sección para los **Eventos de Escape**, mostrando también las diferentes consecuencias: la penalización del Búho, la recompensa del Tucán y la neutralidad de la Libélula.
+3.  **Flujo de Consecuencias:** Todos los resultados (sumar puntos, restar vidas, etc.) ahora convergen en el bloque `V[Verificar Condición de Fin]`, que a su vez tiene la lógica actualizada (`>= 500 puntos`, `<= 0 vidas`, etc.).
 
-    PANTALLA DE VICTORIA
-    Se agregara un personaje saltando y girando de izq a der conanimación de fuegos artificiales y sonidos
-    Se pondrá botón de reiniciar o salir
-    Se pondrá boton de siguiente dificultad
-    Mensaje de puntaje final
-    Estadísticas rápidas (aciertos, fallos, precisión).
+Este nuevo diagrama es mucho más potente. Si se lo mostraras a otro programador, podría entender la esencia y la profundidad de tus mecánicas de juego sin necesidad de ver una sola línea de código. ¡Gran avance
+### PANTALLA PRINCIPAL
+- [x] Logo o título de juego
+- [x] Se agregará botón de jugar
+- [ ] Se agregará botón de leer reglas de juego (Instrucciones)
+- [x] Botón de opciones
+- [ ] Autor
 
-    PANTALLA DE DERROTA
-    Se agregara un sonido de golpe 
-    Se agregará sonido de perdida de fondo
-    Se pondra un personaje triste
-    Se pondrá Boton de reiniciar o salir
-    Se pondrá boton de anterior dificultad
-    Mensaje de puntaje final
-    Estadísticas rápidas (aciertos, fallos, precisión).
+### PANTALLA DE SELECCIÓN DE OPCIONES
+- [x] Se agregará sección de dificultad
+- [ ] Explicación de las dificultades
+- [ ] Se pondrá selección de volumen global, sonido previo para comparar escucha, rotador de sonidos aleatorios
+- [x] Botón para volver al menú
+- [ ] Tengo que hacer un método para actualizar sonido
+
+### PANTALLA DE JUEGO
+- [x] Indicador de nivel de dificultad (la variable ya funciona e impacta el juego)
+- [ ] Contador de puntos animado
+- [ ] Timer animado
+- [x] Indicador de vidas
+- [x] Animación de vidas (los corazones y calaveras)
+- [ ] Barra de vidas (si quieres un fondo para los corazones)
+- [x] Se pondrá un sonido de vuelo a las libélulas (Aletear)
+- [x] Se pondrá un sonido de disparo (Tennis Hit)
+- [x] Se pondrá animación de golpe y salida de bala
+- [x] Se pondrá sonido de muerte de libélula (Low Whoosh)
+- [ ] Sonido de fallo de disparo (cuando se hace clic pero no se acierta)
+- [x] Enemigo al que no dispararle y sus complementos derivados (Tucán)
+
+### PANTALLA DE VICTORIA / DERROTA (Pantalla de Fin)
+- [ ] Se agregará un personaje saltando y girando de izq a der con animación de fuegos artificiales y sonidos (para la victoria)
+- [x] Se agregará sonido de pérdida de fondo (sonidos de victoria/derrota ya implementados)
+- [x] Se pondrá un personaje triste (los NPCs llorando en el resumen)
+- [ ] Se pondrá botón de reiniciar (Jugar de Nuevo) o salir (Volver al Inicio)
+- [x] Mensaje de puntaje final
+- [ ] Estadísticas rápidas (aciertos, fallos, precisión).
+
 # To-Do
-
 ## NPC - Libelula
 ### Que hace?
-- **Función principal:** El sprite original está oculto y actúa como un generador (spawner) de enemigos. También muestra el resumen de bajas en la pantalla final.
+- **Función principal:** El sprite original está oculto y actúa como un generador (spawner) de dos tipos de libélulas. También muestra el resumen de bajas en la pantalla final.
 
 - **Generación de clones (Spawning):**
-    - Únicamente durante el estado de "Juego", crea una nueva libélula (un clon) cada medio segundo.
-    - Lleva un registro de cuántas libélulas se han creado en total (`Creacion de libelulas`).
+    - Únicamente durante el estado de "Juego", crea una nueva libélula cada medio segundo.
+    - **NUEVO:** Al crear un clon, reproduce un sonido de aleteo para alertar al jugador.
+    - Lleva un registro de cuántas libélulas se han creado en total.
 
-- **Comportamiento de cada libélula (clon):**
-    - **Aparición y movimiento:**
-        - Aparece en una posición horizontal aleatoria sobre una "línea de horizonte".
-        - Se le asigna un destino final aleatorio en la parte superior de la pantalla.
-        - Se desliza suavemente en línea recta hacia su destino.
-        - Su velocidad aumenta según el nivel de "Dificultad".
-    - **Animación:**
-        - Aletea constantemente, cambiando entre varios disfraces para simular el vuelo.
-    - **Interacción y destrucción:**
-        - Si es tocada por la 'Bala', se destruye.
-        - Al ser destruida, otorga **5 puntos** al marcador.
-        - Incrementa el contador de `Bajas de libelulas`.
-        - Reproduce un sonido (`Low Whoosh`) al ser destruida.
-    - **Decisión de Diseño:** A diferencia de otros enemigos, la Libélula **no resta vidas** si se escapa. Es un objetivo puramente de puntuación.
-    - **Limpieza:**
-        - Todos los clones en pantalla se eliminan si el estado del juego deja de ser "Juego".
+- **Comportamiento de los clones:**
+    - Al ser creada, cada libélula tiene una **probabilidad de 1 entre 25 de ser una variante Rara**.
+    - **Libélula Normal (24/25 de probabilidad):**
+        - Es de tamaño normal y tiene la animación de aleteo estándar.
+        - Al ser destruida, otorga **+5 puntos**.
+    - **NUEVO - Libélula Rara (1/25 de probabilidad):**
+        - Es más pequeña, tiene un color/disfraz diferente y emite un sonido mágico al aparecer.
+        - Al ser destruida, otorga una **recompensa especial**: **+5 puntos y +1 Vida**, creando un nuevo corazón en la interfaz.
+    - **Comportamiento Común:**
+        - Ambas variantes se mueven desde una posición aleatoria en la "línea de horizonte" hacia un destino aleatorio en la parte superior. Su velocidad de movimiento aumenta con la `Dificultad`.
+        - **Decisión de Diseño:** Ninguna de las dos variantes resta vidas si se escapa.
 
 - **Resumen de Fin de Partida:**
-    - Al llegar a la pantalla de "Fin", el sprite original se hace visible.
-    - Se posiciona en la pantalla de resumen, inclinado.
-    - Muestra un disfraz de "llorando".
-    - Muestra un mensaje con el recuento final de libélulas abatidas versus las creadas.
+    - Muestra el recuento final de libélulas abatidas (de ambos tipos) versus las creadas.
 
 ### Que quiero que haga?
-- **(Prioridad)** Añadir un sonido de "zumbido" o similar al momento de la aparición del clon para normalizarlo con los otros NPCs.
-- **(Opcional - Mejora)** Hacer que la frecuencia de aparición de las libélulas dependa de la variable `Dificultad`, para un escalado más coherente.
-## NPC - Buho
-### Que hace?
-- **Función principal:** El sprite original está oculto y actúa como un generador (spawner) de búhos enemigos. También muestra el resumen de bajas en la pantalla final.
-
-- **Generación de clones (Spawning):**
-    - Únicamente durante el estado de "Juego", crea clones de búho en intervalos de tiempo aleatorios.
-    - A mayor nivel de "Dificultad", los búhos aparecen con más frecuencia.
-    - **NUEVO:** Lleva un registro de cuántos búhos se han creado en total (`Creacion de buhos`).
-
-- **Comportamiento de cada búho (clon):**
-    - **Aparición y movimiento:**
-        - Aparece en una posición horizontal aleatoria sobre una "línea de horizonte".
-        - Realiza un "salto" hacia arriba con una velocidad inicial variable, haciéndolos menos predecibles.
-        - Es afectado por una gravedad constante que lo hace acelerar hacia abajo.
-        - Cae hasta desaparecer, momento en el que se autodestruye.
-    - **Animación y Sonido:**
-        - **NUEVO:** Reproduce un sonido de "salto" al aparecer.
-        - **NUEVO:** Cambia de disfraz para reflejar cada fase de su movimiento: salto, caída y una nueva animación de "burla" en el aire (mira a izquierda o derecha) cuando está en el punto más alto de su salto, haciéndolo más expresivo.
-    - **NUEVO - Interacción y destrucción:**
-        - Si es tocado por la 'Bala', se destruye.
-        - Al ser destruido, otorga **10 puntos** al marcador.
-        - Incrementa el contador de `Bajas de buhos`.
-        - Reproduce un sonido de "muerte".
-    - **Limpieza:**
-        - Todos los clones en pantalla se eliminan si el estado del juego deja de ser "Juego".
-
-- **NUEVO - Resumen de Fin de Partida:**
-    - Al llegar a la pantalla de "Fin", el sprite original se hace visible.
-    - Se posiciona en la pantalla de resumen.
-    - Muestra un disfraz de "llorando".
-    - Muestra un mensaje con el recuento final de búhos abatidos versus los creados (ej: "Haz abatido 5 de 12 Buhos").
-### Que quiero que haga?
-<!-- Aquí puedes anotar tus próximas ideas para este sprite -->
-Si el buho se escapa debe bajar una vida
+- **(Prioridad de Normalización)** Hacer que la **frecuencia de aparición** (el `time.sleep`) dependa de la variable `Dificultad`, para que escale de forma coherente con los otros NPCs.
+- **(Mejora Técnica)** Cambiar el sonido de aparición de `play_until_done` a `play` para asegurar que el movimiento del clon no se retrase.
 
 ## NPC - Tucan
 ### Que hace?
-- **Función principal:** Actúa como un NPC "sagrado" o "amigo". El objetivo del jugador es **NO dispararle**. El sprite original está oculto y gestiona la generación de clones y el resumen final.
+- **Función principal:** Actúa como un NPC "sagrado" o "amigo". El objetivo del jugador es **NO dispararle**.
 
 - **Generación de clones (Spawning):**
-    - Únicamente durante el estado de "Juego", crea un nuevo tucán en intervalos de tiempo aleatorios.
-    - Su frecuencia de aparición y su tamaño inicial dependen de la `Dificultad`.
+    - Crea un nuevo tucán en intervalos de tiempo aleatorios, cuya frecuencia y tamaño dependen de la `Dificultad`.
     - Lleva un registro de cuántos tucanes se han creado y cuántos han sido "abatidos" por error.
 
 - **Comportamiento de cada tucán (clon):**
     - **Aparición y Trayectoria:**
-        - Aparece fuera de la pantalla a la izquierda, en una altura aleatoria, y vuela horizontalmente.
-        - Crea un efecto de perspectiva, creciendo en tamaño al entrar en la pantalla.
-    - **Movimiento Vertical y Animación:**
-        - Realiza un movimiento ondulatorio de zig-zag mientras cruza la pantalla.
-        - La animación de las alas está sincronizada con este movimiento.
+        - Aparece a la izquierda y vuela horizontalmente, con un movimiento ondulatorio de zig-zag.
     - **Interacción (Penalización):**
         - Si el jugador le dispara, el tucán se destruye.
-        - Al ser destruido, **penaliza duramente al jugador**: le resta **25 puntos** y le quita **una vida**.
+        - Penaliza duramente al jugador: le resta **25 puntos** y le quita **una vida**.
         - Reproduce un sonido de "cristal roto" para enfatizar el error.
-    - **Limpieza:**
-        - Todos los clones en pantalla se eliminan si el estado del juego deja de ser "Juego".
+        - **NUEVO:** Al ser destruido, crea un clon del sprite "Calavera" como un efecto visual adicional de la penalización.
+    - **NUEVO - Interacción (Recompensa):**
+        - Si el tucán logra cruzar la pantalla sano y salvo, **recompensa al jugador con +20 puntos**.
 
 - **Resumen de Fin de Partida:**
-    - Al llegar a la pantalla de "Fin", el sprite original se hace visible.
-    - Muestra un disfraz de "llorando".
-    - Muestra un mensaje con el recuento de tucanes "abatidos" por error.
+    - Muestra un disfraz de "llorando" y un mensaje con el recuento de tucanes "abatidos" por error.
 
 ### Que quiero que haga?
-- **(Prioridad de Gameplay)** Mejorar el patrón de movimiento de zig-zag para que se sienta más natural y menos predecible (usando aleatoriedad o una curva sinusoidal).
-- **(Prioridad de Pulido)** Añadir un sonido distintivo y "amigable" al aparecer, para alertar al jugador de su presencia.
-- **(Mejora Opcional)** Implementar un sistema de **recompensa** (ej: +5 puntos) si el tucán logra cruzar la pantalla sano y salvo, reforzando positivamente el comportamiento deseado.
+- **(Prioridad de Pulido)** Añadir un sonido distintivo y "amigable" al aparecer.
+- **(Prioridad de Gameplay)** Mejorar el patrón de movimiento de zig-zag para que se sienta más natural y menos predecible.
+- **(Mejora Opcional)** Añadir un sonido de "recompensa" cuando el tucán escapa exitosamente.
 
 ## Boton - comenzar
 ### Que hace?
@@ -255,38 +228,38 @@ Deberia ponerse arriba sin ser clickable cuando entro a opciones y centrarse
 ### Que quiero que haga?
 <!-- Aquí puedes anotar tus próximas ideas para este sprite -->
 
-
-## Fondo
+## Fondo (Stage)
 ### Que hace?
-- **Función principal:** Sigue actuando como el **controlador central del juego**, gestionando los estados, variables globales y la lógica principal de la partida.
+- **Función principal:** Actúa como el controlador central del juego, gestionando los estados, variables globales y la lógica principal de la partida.
 
 - **Al iniciar (Bandera Verde):**
-    - Inicializa variables globales clave: `Dificultad` en 1, volumen, y coordenadas para la pantalla de resumen.
-    - Lanza el evento "Inicio" para mostrar el menú principal.
+    - Inicializa variables globales y lanza el evento "Inicio".
 
 - **Gestión de Pantallas:**
-    - Recibe eventos ("Inicio", "Opciones", "Juego", "Fin") y cambia la imagen del fondo para que coincida con el estado actual del juego.
+    - Cambia la imagen del fondo para que coincida con el estado actual del juego.
 
 - **Lógica del Juego (al recibir "Juego"):**
     - **Inicialización de la partida:**
         - Pone a cero los `Puntos`.
-        - **NUEVO:** Establece las `Vidas` del jugador en 3.
+        - **NUEVO:** Inicializa la variable `Balas disparadas` a 0, preparando el sistema de precisión.
+        - **NUEVO - Sistema de Vidas Modular:**
+            - Establece `Vidas iniciales` en 3.
+            - Calcula `Vidas totales` sumando las `Vidas iniciales` y las `Vidas extra` (obtenidas de las libélulas raras).
         - Reinicia el `Tiempo Partida`.
     - **Monitorea Múltiples Condiciones de Fin de Partida:**
-        1.  **Victoria:** Si el jugador alcanza 100 `Puntos`, emite la señal de "Fin".
-        2.  **Derrota por Tiempo:** Si el temporizador `Tiempo Partida` llega a 0, emite la señal de "Fin".
-        3.  **NUEVO - Derrota por Vidas:** Si las `Vidas` del jugador llegan a 0, emite la señal de "Fin".
+        1.  **Victoria:** Si el jugador, **NUEVO**, alcanza **500 Puntos**, emite la señal de "Fin".
+        2.  **Derrota por Tiempo:** Si el temporizador llega a 0, emite la señal de "Fin".
+        3.  **Derrota por Vidas:** Si las `Vidas totales` llegan a 0, emite la señal de "Fin".
 
 - **Pantalla de Fin (al recibir "Fin"):**
-    - **NUEVO - Pantallas de Fin Dinámicas:**
-        - Muestra un fondo específico dependiendo de la causa del final: `Fin - Ganador`, `Fin - 0Tiempo` o `Fin - 0Vidas`.
-        - Reproduce un sonido de victoria solo si se gana por puntos.
-    - **NUEVO - Cálculo de Puntaje Final:**
-        - Calcula un `Puntaje final` complejo que toma en cuenta la Dificultad, los Puntos obtenidos, las Vidas restantes y el tiempo utilizado, premiando la eficiencia.
-    - **NUEVO - Resumen de Estadísticas:**
-        - Prepara la lógica para mostrar un resumen de la partida (ej: "Haz abatido X de Y Búhos").
+    - Muestra un fondo específico dependiendo de la causa del final.
+    - Calcula un `Puntaje final` complejo que premia la eficiencia del jugador.
+    - Prepara la lógica para mostrar el resumen de estadísticas de la partida.
 
 ### Que quiero que haga?
+<!--
+- Implementar el cálculo y la visualización de la Precisión en la pantalla de Fin, usando la variable 'Balas disparadas'.
+-->
 
 #### 1. Mecánicas de Juego Fundamentales
 
@@ -308,69 +281,78 @@ Deberia ponerse arriba sin ser clickable cuando entro a opciones y centrarse
     - [ ] Añadir un botón en "Créditos" para volver a `Inicio`.
 
 # Hoja de Ruta del Proyecto
+# ✅ Checklist Maestra Unificada (Recta Final v1.0)
 
-### Parte 1: Tareas Fundamentales (Lo Necesario para una Versión 1.0 Completa)
-*Estas son las prioridades. Completa estas tareas para tener un juego funcional, pulido y terminado en su ciclo principal. Te recomiendo hacerlas en este orden.*
+### 🎯 Prioridad 1: Completar el Bucle de Gameplay Esencial
+*(Tareas que definen si se puede jugar de principio a fin con todas las reglas claras)*
 
-#### Completar la Mecánica Central de Juego:
-- **Implementar colisiones para el Búho y el Tucán:** La tarea más crítica. Sin esto, no son enemigos, son decoración.
-- **Crear contadores para cada tipo de enemigo:** Necesitas variables separadas (`libelulas_derrotadas`, `buhos_derrotados`, etc.) que se incrementen al colisionar.
-- **Calcular el puntaje total:** Usa los contadores para asignar diferentes puntos por enemigo (ej: Libélula=5, Búho=10, Tucán=15) y sumarlos a la variable `Puntos`.
-- **Refactorizar el movimiento del Tucán:** Implementa el sistema de gravedad que querías en lugar del zig-zag.
+- **Sistema de Precisión y Recarga de Arma:**
+    - Implementar el contador `Balas disparadas`.
+    - Añadir la mecánica de **recarga** cada 6 disparos (usando el módulo).
+    - Crear la animación y el sonido de recarga, y la lógica para que no se pueda disparar durante ella.
+- **Pantalla de Estadísticas Finales:**
+    - Calcular y mostrar la **precisión** del jugador (`bajas / disparos * 100`).
+    - Mostrar el **Puntaje Final** y las bajas de cada tipo de NPC.
+- **Botones de Flujo de Juego:**
+    - Añadir y programar el botón **"Jugar de Nuevo"** en la pantalla de Fin.
+    - Añadir y programar el botón **"Instrucciones"** en el menú principal.
+    - Añadir y programar el botón **"Créditos"** y poner tu nombre/enlace a GitHub.
 
-#### Pulido y Feedback (Audio y Video):
-- **Añadir sonidos a los NPCs:** Asigna un sonido de aparición y de destrucción a cada enemigo nuevo. Esto da una satisfacción inmensa al jugador.
-- **Revisar y sincronizar animaciones:** Asegúrate de que las animaciones de aleteo o salto de los nuevos NPCs se vean fluidas y naturales.
+### ✨ Prioridad 2: Pulido de NPCs y Feedback al Jugador
+*(Tareas que hacen que el juego se sienta vivo, justo y profesional)*
 
-#### Completar el Flujo del Juego:
-- **Mostrar el puntaje final:** En la pantalla de "Fin", muestra un texto claro con el puntaje total que el jugador consiguió.
-- **Crear una pantalla de "Créditos":** Un nuevo estado/fondo que aparezca desde el menú de inicio o de opciones. Es fundamental para profesionalizar tu proyecto.
-- **Añadir un enlace a tu GitHub en los Créditos:** Para que puedas mostrar tu trabajo y tu código.
+- **Pulido del Tucán:**
+    - Mejorar el patrón de movimiento del zig-zag (con aleatoriedad o una curva sinusoidal).
+    - Añadirle un sonido de aparición "amigable" para diferenciarlo.
+    - Añadirle un sonido de "recompensa" cuando escapa exitosamente.
+- **Pulido de la Libélula:**
+    - Ajustar la frecuencia de aparición para que dependa de la `Dificultad`.
+- **Efectos Visuales ("Game Feel"):**
+    - Implementar el efecto **"Hit Flash"** (el enemigo parpadea en blanco al ser golpeado) para un mejor feedback de impacto.
 
----
+### ⚖️ Prioridad 3: Balance Final y Refinamiento Estético
+*(Tareas de ajuste fino que se hacen cuando todo lo demás ya funciona)*
 
-### Parte 2: Ideas de Expansión (Lo Opcional para una Versión 2.0)
-*Una vez que la Parte 1 esté terminada y pulida, puedes empezar a añadir estas características que le darán una profundidad increíble al juego.*
-
-#### Nuevas Mecánicas de Jugador:
-- **Sistema de Vidas:** Además del temporizador, el jugador podría tener 3 vidas y perder una si un enemigo llega a la parte inferior de la pantalla.
-- **Múltiples Armas (Pistola / Escopeta):**
-    - **Pistola:** La actual. Disparo rápido y preciso.
-    - **Escopeta:** Disparo más lento pero que lanza varias "balas" en un cono, ideal para limpiar grupos de enemigos a corta distancia.
-- **Sistema de Combos:** Si el jugador acierta a varios enemigos seguidos sin fallar un tiro, un multiplicador de puntos se activa (x1, x2, x3...).
-
-#### Mejoras de Interfaz y Progresión:
-- **Barra de Puntos Animada:** En lugar de solo un número, una barra que se va llenando hasta los 100 puntos.
-- **Sistema de Desbloqueo:** La escopeta podría desbloquearse automáticamente la primera vez que el jugador llega a la pantalla de "Fin". El juego podría guardar una variable en un archivo para recordar que ya está desbloqueada.
-- **Tienda en el Juego:** Usar los puntos ganados como moneda para comprar mejoras (más tiempo, una vida extra, etc.) desde la pantalla de "Inicio".
-
----
-
-### Parte 3: Sugerencias Adicionales (Más Ideas para el Futuro)
-*Aquí te dejo algunas ideas extra, basadas en lo que ya has construido, para "motivar la llama":*
-
-#### Enemigos Especiales (Variantes):
-- **La Libélula Dorada:** Una libélula que aparece muy de vez en cuando, es mucho más rápida que las normales, pero si logras acertarle, te da una cantidad enorme de puntos (ej: 50 puntos). Es fácil de implementar (cambiar color, velocidad y puntos) y añade mucha emoción.
-
-#### Power-Ups:
-- Crea un nuevo sprite que aparezca ocasionalmente. Si le disparas, te da una ventaja temporal:
-    - **Reloj (Slow-Motion):** Ralentiza a todos los enemigos en pantalla durante 5 segundos.
-    - **Estrella (Disparo Triple):** Durante 10 segundos, tu arma dispara tres balas a la vez.
-
-#### Persistencia de Puntuación (High Score):
-- **Guarda la puntuación más alta** en un archivo de texto. En la pantalla de "Inicio" y "Fin", muestra siempre el "High Score" actual. Esto da al jugador una razón para volver a jugar e intentar superar su propio récord. Es un desafío de programación muy interesante.
-
-#### Mejoras de "Game Feel":
-- **Screen Shake (Sacudida de pantalla):** Cuando un enemigo es destruido, haz que la pantalla tiemble ligeramente por una fracción de segundo. Es un efecto sutil que hace que los impactos se sientan mucho más potentes.
-- **Efecto de "Hit Flash":** Cuando una bala le da a un enemigo, haz que el enemigo parpadee en blanco por un instante antes de desaparecer.
-
-Estoy haciendo funcionar los fondos 
-Se añadieron vidas para  gestionar el otro fondo
-Se me ocurrio un sistema de vidas
-con una variable k que va ir creciendo y la colision de un objeto calavera
-Calculo de score: dificultad*tiempo restante
+- **Balance de Dificultad:**
+    - Revisar y ajustar las fórmulas de frecuencia de aparición y velocidad de todos los NPCs para que el juego escale bien de dificultad 1 a 5.
+- **Balance de Puntuación:**
+    - Revisar y ajustar la fórmula del `Puntaje Final` para que los valores que arroja se sientan justos y gratificantes.
+- **Animaciones de la Interfaz:**
+    - Añadir animaciones a los contadores de puntos y tiempo para que no sean estáticos.
+    - Añadir la animación del "personaje victorioso" en la pantalla de Fin.
+- **Organización del Código (Refactorización final):**
+    - Revisar todos los sprites y ordenar las variables.
+    - Asegurarse de que los nombres de las variables sean claros y consistentes.
+    - Añadir comentarios finales donde la lógica sea especialmente compleja.
 
 # Cerrado sin idea de modificar
+# To-Do
+## NPC - Buho
+### Que hace?
+- **Función principal:** Actúa como la **amenaza principal** del juego. El sprite original está oculto y gestiona la generación de clones y el resumen final.
+
+- **Generación de clones (Spawning):**
+    - Crea clones de búho en intervalos de tiempo aleatorios.
+    - La frecuencia de aparición aumenta con la `Dificultad`.
+    - Lleva un registro de cuántos búhos se han creado.
+
+- **Comportamiento de cada búho (clon):**
+    - **Aparición y movimiento:**
+        - Aparece en una posición aleatoria y realiza un "salto" con una velocidad inicial variable, siguiendo una curva de gravedad.
+        - Reproduce un sonido de búho (`Owl`) al aparecer.
+    - **Animación:**
+        - Cambia de disfraz para reflejar cada fase de su movimiento: salto, caída y una animación de "burla" en el aire.
+    - **Interacción (Destrucción):**
+        - Si es tocado por la 'Bala', se destruye.
+        - Otorga **+10 puntos** y reproduce un sonido de "muerte" (`Chirp`).
+    - **NUEVO - Interacción (Escape / Penalización):**
+        - Si el búho completa su salto y cae por debajo de la pantalla (se escapa), **penaliza al jugador quitándole una vida**.
+        - El escape se comunica con un sonido (`Low Boing`) y la aparición de un sprite de "Calavera".
+
+- **Resumen de Fin de Partida:**
+    - Muestra un disfraz de "llorando" y un mensaje con el recuento de búhos abatidos versus los creados.
+
+
 ## Boton - Dificultad
 ### Que hace?
 - **Función principal:** Gestiona el ajuste del nivel de dificultad del juego.
@@ -390,24 +372,7 @@ Calculo de score: dificultad*tiempo restante
         - El nivel mínimo de dificultad es 1. Si se intenta bajar más, muestra un mensaje de advertencia.
     - **Feedback:** Después de cada cambio, muestra el nuevo valor de dificultad por un momento.
 
-## Bala
-### Que hace?
-- **Función principal:** El sprite original actúa como una "plantilla" que permanece oculta y fuera de la pantalla. La lógica principal se ejecuta en sus clones.
-- **Decisión de diseño:** Se ha decidido mantener una única arma (pistola) para enfocar el gameplay.
 
-- **Comportamiento de cada clon (cuando se dispara):**
-    - **Aparición:**
-        - Se crea en la misma posición que el sprite "Arma".
-        - Apunta en la dirección del mouse en el momento del disparo.
-        - Captura las coordenadas exactas del mouse para usarlas como su destino.
-    - **Trayectoria:**
-        - Se hace visible y reproduce un sonido de disparo.
-        - Se desliza rápidamente (en 0.25 segundos) hasta la posición de destino que capturó.
-        - **Actualizado:** Activa una variable (`Bandera de disparo`) para que los enemigos puedan registrar el impacto, pero ahora lo hace por un tiempo mucho más corto **(0.05 segundos)**, requiriendo más precisión.
-    - **Impacto y desaparición:**
-        - Al llegar a su destino, desactiva la "Bandera de disparo".
-        - Entra en un bucle donde su tamaño se reduce progresivamente hasta que desaparece, creando un efecto de impacto.
-        - (El clon se autodestruye después de su animación).
 
 ## Arma
 ### Que hace?
@@ -422,7 +387,7 @@ Calculo de score: dificultad*tiempo restante
         - Dispara (crea un clon del sprite "Bala").
         - Realiza una pequeña animación de retroceso inclinándose.
         - Espera a que se suelte el botón del mouse antes de volver a su posición original.
-# To-Do
+
 ## Sprite - Mira
 ### Que hace?
 - **Función principal:** Actúa como el cursor principal del jugador, cambiando su apariencia y comportamiento según el estado del juego.
@@ -442,3 +407,56 @@ Calculo de score: dificultad*tiempo restante
         - Hereda el comportamiento de la pantalla de `Inicio`, manteniendo la coherencia del cursor en los menús.
 
 
+## Sprite - Corazon (UI Vidas)
+### Que hace?
+- **Función principal:** Actúa como el sistema visual que representa las vidas del jugador. El sprite original está oculto y se encarga de generar los clones de corazón.
+
+- **Generación de clones (al recibir "Juego"):**
+    - El sprite principal se prepara en la esquina superior de la pantalla.
+    - **NUEVO:** Crea un clon por cada vida que tiene el jugador, con una pequeña pausa entre cada uno, creando una animación de "llenado" de la barra de vidas.
+
+- **Comportamiento de cada clon de corazón:**
+    - **Aparición:**
+        - Se posiciona en la pantalla, espaciado correctamente de los otros corazones.
+        - **NUEVO:** Reproduce un sonido `pop` al aparecer.
+        - **NUEVO:** Realiza una pequeña animación de "salto" y crecimiento al ser creado.
+    - **NUEVO - Animaciones Continuas:**
+        - Una vez en pantalla, cada corazón entra en un bucle donde se anima constantemente, "tambaleándose" y dando pequeños saltos para que la interfaz se sienta viva.
+    - **NUEVO - Lógica de Destrucción Visual:**
+        - Cada corazón ahora está "atento" a si toca un sprite de "Calavera".
+        - Si un "Sprite - Calavera" (generado por un error del jugador) lo toca, el corazón se autodestruye.
+    - **Limpieza de Partida:**
+        - Los clones se autodestruyen si el juego vuelve a la pantalla de "Inicio" o "Fin", dejando el escenario limpio para la siguiente partida.
+
+## Sprite - Calavera (UI Efecto de Daño)
+### Que hace?
+- **Función principal:** Actúa como un **indicador visual permanente** de las vidas perdidas. El sprite original permanece siempre oculto.
+
+- **Generación de clones:**
+    - Un clon de este sprite se crea cada vez que el jugador comete un error que le cuesta una vida.
+
+- **Comportamiento de cada clon de Calavera:**
+    - **Aparición Inteligente:**
+        - Aparece directamente sobre la interfaz de vidas.
+        - Utiliza las mismas variables que el sprite de corazones para calcular su posición, apareciendo **exactamente sobre el último corazón de la fila**.
+    - **Animación y Sonido de Aparición:**
+        - Se hace visible, reproduce un sonido de error (`Oops`).
+        - Realiza una animación de crecimiento para atraer la atención del jugador.
+    - **Lógica de "Reemplazo":**
+        - Su aparición sobre un `Sprite - Corazon` activa la lógica de destrucción de ese corazón.
+    - **NUEVO - Decisión de Diseño:**
+        - La calavera **no se autodestruye**. Permanece en la pantalla por el resto de la partida, actuando como un recordatorio visual y permanente del error cometido.
+
+## Bala
+### Que hace?
+- **Función principal:** El sprite original actúa como una "plantilla". La lógica principal se ejecuta en sus clones.
+- **Decisión de diseño:** Se mantiene una única arma para enfocar el gameplay.
+
+- **Comportamiento de cada clon (cuando se dispara):**
+    - **NUEVO - Conteo de Disparos:**
+        - Al ser creado, incrementa la variable global `Balas disparadas` en 1. Este contador será usado para el sistema de precisión y la mecánica de recarga.
+    - **Aparición y Trayectoria:**
+        - Se posiciona en el 'Arma' y apunta hacia el mouse.
+        - Se desliza rápidamente hasta el destino, activando la `Bandera de disparo` por un breve momento para permitir la colisión.
+    - **Impacto y desaparición:**
+        - Entra en un bucle donde su tamaño se reduce progresivamente hasta que desaparece, creando un efecto de impacto.
