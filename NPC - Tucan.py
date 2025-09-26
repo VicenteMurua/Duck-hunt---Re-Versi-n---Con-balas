@@ -43,6 +43,7 @@ def on_received():
 @event.received('Juego')
 def on_received1():
     global Distancia_de_buho_final_eje_x, Cuadrado_de_la_distancia_de_buho_final_eje_x, Distancia_de_buho_final_eje_y, Cuadrado_de_la_distancia_de_buho_final_eje_y, Distancia_vectorial_de_buho, Distancia_de_tucan_final_eje_x, Distancia_de_tucan_final_eje_y, Cuadrado_de_la_distancia_de_tucan_final_eje_x, Cuadrado_de_la_distancia_de_tucan_final_eje_y, Distancia_vectorial_tucan
+    sprite.hide()
     sprite.x = 0
     sprite.y = -180
     # not supported yet
@@ -69,11 +70,16 @@ def on_received2():
     sprite.x = (sprite.get_variable('Posicion resumen eje x') + -27)
     sprite.y = (sprite.get_variable('Posicion resumen eje y') + -20)
     sprite.size = 40
+    if (100 * ((sprite.get_variable('Creacion de tucanes') - sprite.get_variable('Bajas de tucanes')))) / sprite.get_variable('Creacion de tucanes') > 70:
+        sprite.set_costume('Toucan - Normal')
+
+    else:
+        sprite.set_costume('Toucan - Llorando')
+
     sprite.show()
-    sprite.set_costume('Toucan - Llorando')
     sprite.z_index = 256
     time.sleep(0.05)
-    sprite.say(str(str('Haz abatido ') + str(sprite.get_variable('Bajas de tucanes'))) + str(str(' de ') + str(sprite.get_variable('Creacion de tucanes'))))
+    sprite.say(str(str('Han pasado ') + str((sprite.get_variable('Creacion de tucanes') - sprite.get_variable('Bajas de tucanes')))) + str(str(' de ') + str(sprite.get_variable('Creacion de tucanes'))))
 
 
 
@@ -108,7 +114,7 @@ sprite.z_index = 256
 sprite.set_costume('Toucan - Caida')
 sprite.z_index = sprite.z_index-1
 sprite.show()
-sprite.size = 15 * sprite.get_variable('Dificultad')
+sprite.size = 10 * sprite.get_variable('Dificultad')
 sprite.x = -240
 sprite.y = random.uniform((sprite.get_variable('Linea de horizonte') - 40), (sprite.get_variable('Tope Vertical') - 100))
 while True:
@@ -152,9 +158,3 @@ while True:
             sprite.play('Glass Breaking')
             sprite.clone('Sprite - Calavera')
             # not supported yet
-
-
-
-
-if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
-    # not supported yet

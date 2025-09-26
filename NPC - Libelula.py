@@ -34,7 +34,7 @@ def Movimiento_de_libelulas():
 def Generador_de_libelulas():
     global Cuadrado_de_la_distancia_de_libelula_final_eje_x, Cuadrado_de_la_distancia_de_libelula_final_eje_y
     while True:
-        time.sleep(0.5)
+        time.sleep(float((0.1 + 1.5 / sprite.get_variable('Dificultad'))))
         sprite.clone('_myself_')
         v = sprite.get_variable('Creacion de libelulas')
         sprite.set_variable('Creacion de libelulas', v + 1)
@@ -102,7 +102,7 @@ def on_received2():
     sprite.set_costume('Libelula - Llorando')
     sprite.z_index = 256
     time.sleep(0.1)
-    sprite.say(str(str('Haz abatido ') + str(sprite.get_variable('Bajas de libelulas'))) + str(str(' de ') + str(sprite.get_variable('Creacion de libelulas'))))
+    sprite.say(str(str('Has abatido ') + str(sprite.get_variable('Bajas de libelulas'))) + str(str(' de ') + str('20')))
 
 
 @event.received('Inicio')
@@ -140,7 +140,7 @@ if sprite.get_variable('Aleatotiedad de libelula') == 1:
         if sprite.get_variable('Bandera de disparo') == 1:
             if sprite.touching('Bala') or sprite.get_variable('Distancia vectorial de libelula') < 5:
                 v = sprite.get_variable('Puntos')
-                sprite.set_variable('Puntos', v + 5)
+                sprite.set_variable('Puntos', v + 500 * ((0.8 + 0.2 * sprite.get_variable('Dificultad'))))
                 v = sprite.get_variable('Bajas de libelulas')
                 sprite.set_variable('Bajas de libelulas', v + 1)
                 v = sprite.get_variable('Vidas totales')
@@ -160,7 +160,7 @@ else:
         if sprite.get_variable('Bandera de disparo') == 1:
             if sprite.touching('Bala') or sprite.get_variable('Distancia vectorial de libelula') < 5:
                 v = sprite.get_variable('Puntos')
-                sprite.set_variable('Puntos', v + 5)
+                sprite.set_variable('Puntos', v + 100 * ((0.8 + 0.2 * sprite.get_variable('Dificultad'))))
                 v = sprite.get_variable('Bajas de libelulas')
                 sprite.set_variable('Bajas de libelulas', v + 1)
                 sprite.play('Low Whoosh')
