@@ -126,33 +126,21 @@ Este nuevo diagrama es mucho más potente. Si se lo mostraras a otro programador
 - [ ] Estadísticas rápidas (aciertos, fallos, precisión).
 
 # To-Do
-## NPC - Libelula
+## Arma
 ### Que hace?
-- **Función principal:** El sprite original está oculto y actúa como un generador (spawner) de dos tipos de libélulas. También muestra el resumen de bajas en la pantalla final.
-
-- **Generación de clones (Spawning):**
-    - Únicamente durante el estado de "Juego", crea una nueva libélula cada medio segundo.
-    - **NUEVO:** Al crear un clon, reproduce un sonido de aleteo para alertar al jugador.
-    - Lleva un registro de cuántas libélulas se han creado en total.
-
-- **Comportamiento de los clones:**
-    - Al ser creada, cada libélula tiene una **probabilidad de 1 entre 25 de ser una variante Rara**.
-    - **Libélula Normal (24/25 de probabilidad):**
-        - Es de tamaño normal y tiene la animación de aleteo estándar.
-        - Al ser destruida, otorga **+5 puntos**.
-    - **NUEVO - Libélula Rara (1/25 de probabilidad):**
-        - Es más pequeña, tiene un color/disfraz diferente y emite un sonido mágico al aparecer.
-        - Al ser destruida, otorga una **recompensa especial**: **+5 puntos y +1 Vida**, creando un nuevo corazón en la interfaz.
-    - **Comportamiento Común:**
-        - Ambas variantes se mueven desde una posición aleatoria en la "línea de horizonte" hacia un destino aleatorio en la parte superior. Su velocidad de movimiento aumenta con la `Dificultad`.
-        - **Decisión de Diseño:** Ninguna de las dos variantes resta vidas si se escapa.
-
-- **Resumen de Fin de Partida:**
-    - Muestra el recuento final de libélulas abatidas (de ambos tipos) versus las creadas.
+- **Función principal:** Actúa como la herramienta principal de interacción del jugador. Su lógica está autocontenida y gestiona el disparo y la nueva mecánica de recarga.
+- **Inicialización:** Al iniciar el programa, el arma permanece oculta y define las variables del cargador (`Cargador - Balas totales` = 6, `Balas - En cargador` = 0).
+- **Comportamiento en Juego:**
+    - Se hace visible en la capa superior y sigue al puntero del mouse con un desplazamiento fijo.
+    - Al hacer clic, dispara un clon del sprite `Bala`, realiza una animación de retroceso y suma 1 al contador de `Balas - En cargador`.
+- **Sistema de Recarga Táctica (Automática y Manual):**
+    - **Recarga Automática:** Después de disparar la 6ª bala, el arma activa automáticamente una secuencia de recarga.
+    - **Recarga Manual:** El jugador puede pulsar la tecla **'R'** en cualquier momento para iniciar una recarga táctica.
+    - **Feedback:** La recarga tiene una animación visual y un sonido distintivo, creando una pausa de 0.4 segundos que impide disparar. Al finalizar, resetea el contador `Balas - En cargador` a 0.
+- **Decisión de Diseño:** El juego se centrará en una única arma. No se implementarán diferentes tipos de armas o balas.
 
 ### Que quiero que haga?
-- **(Prioridad de Normalización)** Hacer que la **frecuencia de aparición** (el `time.sleep`) dependa de la variable `Dificultad`, para que escale de forma coherente con los otros NPCs.
-- **(Mejora Técnica)** Cambiar el sonido de aparición de `play_until_done` a `play` para asegurar que el movimiento del clon no se retrase.
+- **(Prioridad de Interfaz)** Crear un **contador visual** en la pantalla de juego que muestre las balas restantes en el cargador (ej: 6/6, 5/6, ...), para que el jugador pueda gestionar la recarga de forma más estratégica.
 
 ## NPC - Tucan
 ### Que hace?
@@ -181,20 +169,6 @@ Este nuevo diagrama es mucho más potente. Si se lo mostraras a otro programador
 - **(Prioridad de Gameplay)** Mejorar el patrón de movimiento de zig-zag para que se sienta más natural y menos predecible.
 - **(Mejora Opcional)** Añadir un sonido de "recompensa" cuando el tucán escapa exitosamente.
 
-## Boton - comenzar
-### Que hace?
-- Al iniciar el programa (bandera verde), el botón está oculto.
-- Se muestra únicamente en la pantalla de "Inicio", posicionado en el centro.
-- Cuando el puntero del mouse está sobre él y se hace clic:
-    - Reproduce un sonido "pop".
-    - Envía la señal para que el juego cambie al estado "Juego".
-    - Se oculta y detiene su funcionamiento.
-- Si se llega a la pantalla de "Opciones", el botón se asegura de permanecer oculto.
-
-### Que quiero que haga?
-<!-- Aquí puedes anotar tus próximas ideas para este sprite -->
-
-
 ## Boton - Opciones
 ### Que hace?
 - Al iniciar el programa (bandera verde), el botón está oculto.
@@ -218,48 +192,24 @@ Deberia ponerse arriba sin ser clickable cuando entro a opciones y centrarse
 ### Que quiero que haga?
 <!-- Aquí puedes anotar tus próximas ideas para este sprite -->
 
-## Boton - Inicio
-### Que hace?
-- Funciona como un botón para "Volver al Menú Principal".
-- Se muestra durante las pantallas de "Opciones", "Juego" y "Fin".
-- Cuando el jugador hace clic en él, envía la señal para volver a la pantalla de "Inicio".
-- Permanece oculto en la pantalla de "Inicio" para evitar redundancia.
-
-### Que quiero que haga?
-<!-- Aquí puedes anotar tus próximas ideas para este sprite -->
-
 ## Fondo (Stage)
 ### Que hace?
-- **Función principal:** Actúa como el controlador central del juego, gestionando los estados, variables globales y la lógica principal de la partida.
-
-- **Al iniciar (Bandera Verde):**
-    - Inicializa variables globales y lanza el evento "Inicio".
-
-- **Gestión de Pantallas:**
-    - Cambia la imagen del fondo para que coincida con el estado actual del juego.
-
-- **Lógica del Juego (al recibir "Juego"):**
-    - **Inicialización de la partida:**
-        - Pone a cero los `Puntos`.
-        - **NUEVO:** Inicializa la variable `Balas disparadas` a 0, preparando el sistema de precisión.
-        - **NUEVO - Sistema de Vidas Modular:**
-            - Establece `Vidas iniciales` en 3.
-            - Calcula `Vidas totales` sumando las `Vidas iniciales` y las `Vidas extra` (obtenidas de las libélulas raras).
-        - Reinicia el `Tiempo Partida`.
-    - **Monitorea Múltiples Condiciones de Fin de Partida:**
-        1.  **Victoria:** Si el jugador, **NUEVO**, alcanza **500 Puntos**, emite la señal de "Fin".
-        2.  **Derrota por Tiempo:** Si el temporizador llega a 0, emite la señal de "Fin".
-        3.  **Derrota por Vidas:** Si las `Vidas totales` llegan a 0, emite la señal de "Fin".
-
-- **Pantalla de Fin (al recibir "Fin"):**
-    - Muestra un fondo específico dependiendo de la causa del final.
-    - Calcula un `Puntaje final` complejo que premia la eficiencia del jugador.
-    - Prepara la lógica para mostrar el resumen de estadísticas de la partida.
+- **Función principal:** Actúa como el controlador central del juego, gestionando los estados, las variables globales y la lógica principal de la partida.
+- **Inicialización:** Al iniciar el programa, define todas las variables globales clave, como los límites del escenario, las variables del menú, la dificultad por defecto, el tiempo, etc.
+- **Gestión de Pantallas:** Cambia la imagen del fondo para que coincida con el estado actual del juego (`Inicio`, `Juego`, `Opciones`, `Instrucciones`, `Creditos`, `Fin`).
+- **Lógica de Partida:**
+    - **Inicialización:** Al empezar una partida, resetea todas las variables relevantes (puntos, vidas, balas, tiempo).
+    - **Sistema de Vidas Modular:** Gestiona las vidas del jugador sumando las `Vidas iniciales` y las `Vidas extra` ganadas.
+- **Condiciones de Fin de Partida:** Monitorea y finaliza la partida si ocurre alguna de estas condiciones:
+    1.  **Victoria:** El jugador derrota a 20 libélulas.
+    2.  **Derrota por Tiempo:** El temporizador de 30 segundos llega a cero.
+    3.  **Derrota por Vidas:** El jugador pierde todas sus vidas.
+- **Pantalla de Fin:**
+    - Muestra un fondo específico dependiendo de la causa del final (Victoria, Sin Tiempo, Sin Vidas).
+    - Calcula un `Puntaje final` complejo basado en el rendimiento general del jugador.
 
 ### Que quiero que haga?
-<!--
-- Implementar el cálculo y la visualización de la Precisión en la pantalla de Fin, usando la variable 'Balas disparadas'.
--->
+<!-- Este sprite está COMPLETO. Su lógica y funcionalidad principal están finalizadas. -->
 
 #### 1. Mecánicas de Juego Fundamentales
 
@@ -285,18 +235,10 @@ Deberia ponerse arriba sin ser clickable cuando entro a opciones y centrarse
 
 ### 🎯 Prioridad 1: Completar el Bucle de Gameplay Esencial
 *(Tareas que definen si se puede jugar de principio a fin con todas las reglas claras)*
-
-- **Sistema de Precisión y Recarga de Arma:**
-    - Implementar el contador `Balas disparadas`.
-    - Añadir la mecánica de **recarga** cada 6 disparos (usando el módulo).
-    - Crear la animación y el sonido de recarga, y la lógica para que no se pueda disparar durante ella.
+- Objetivo nuevo matar 20 libelulas
 - **Pantalla de Estadísticas Finales:**
-    - Calcular y mostrar la **precisión** del jugador (`bajas / disparos * 100`).
-    - Mostrar el **Puntaje Final** y las bajas de cada tipo de NPC.
-- **Botones de Flujo de Juego:**
-    - Añadir y programar el botón **"Jugar de Nuevo"** en la pantalla de Fin.
-    - Añadir y programar el botón **"Instrucciones"** en el menú principal.
-    - Añadir y programar el botón **"Créditos"** y poner tu nombre/enlace a GitHub.
+    - Mostrar el **Puntaje Final**
+    ponerle carita feliz al tucan si al menos 70% de los tucanes pasaron
 
 ### ✨ Prioridad 2: Pulido de NPCs y Feedback al Jugador
 *(Tareas que hacen que el juego se sienta vivo, justo y profesional)*
@@ -309,6 +251,8 @@ Deberia ponerse arriba sin ser clickable cuando entro a opciones y centrarse
     - Ajustar la frecuencia de aparición para que dependa de la `Dificultad`.
 - **Efectos Visuales ("Game Feel"):**
     - Implementar el efecto **"Hit Flash"** (el enemigo parpadea en blanco al ser golpeado) para un mejor feedback de impacto.
+
+    Hacer un contador de balas animación de recarga más elaborada
 
 ### ⚖️ Prioridad 3: Balance Final y Refinamiento Estético
 *(Tareas de ajuste fino que se hacen cuando todo lo demás ya funciona)*
@@ -326,67 +270,34 @@ Deberia ponerse arriba sin ser clickable cuando entro a opciones y centrarse
     - Añadir comentarios finales donde la lógica sea especialmente compleja.
 
 # Cerrado sin idea de modificar
-# To-Do
+## NPC
+Refactorizar condiciones de detenimiento
 ## NPC - Buho
 ### Que hace?
-- **Función principal:** Actúa como la **amenaza principal** del juego. El sprite original está oculto y gestiona la generación de clones y el resumen final.
-
+- **Función principal:** Actúa como la **amenaza prioritaria** del juego, con un comportamiento dinámico y una recompensa que escalan con la dificultad.
 - **Generación de clones (Spawning):**
-    - Crea clones de búho en intervalos de tiempo aleatorios.
-    - La frecuencia de aparición aumenta con la `Dificultad`.
-    - Lleva un registro de cuántos búhos se han creado.
-
-- **Comportamiento de cada búho (clon):**
-    - **Aparición y movimiento:**
-        - Aparece en una posición aleatoria y realiza un "salto" con una velocidad inicial variable, siguiendo una curva de gravedad.
-        - Reproduce un sonido de búho (`Owl`) al aparecer.
-    - **Animación:**
-        - Cambia de disfraz para reflejar cada fase de su movimiento: salto, caída y una animación de "burla" en el aire.
-    - **Interacción (Destrucción):**
-        - Si es tocado por la 'Bala', se destruye.
-        - Otorga **+10 puntos** y reproduce un sonido de "muerte" (`Chirp`).
-    - **NUEVO - Interacción (Escape / Penalización):**
-        - Si el búho completa su salto y cae por debajo de la pantalla (se escapa), **penaliza al jugador quitándole una vida**.
-        - El escape se comunica con un sonido (`Low Boing`) y la aparición de un sprite de "Calavera".
-
+    - **Balance Dinámico:** La frecuencia de aparición se calcula con una fórmula logarítmica, creando una curva de desafío pulida que aumenta la presión en los niveles más altos.
+- **Comportamiento del clon:**
+    - **Movimiento Dinámico:** La altura y velocidad de su "salto" inicial dependen de la dificultad, siguiendo una curva de gravedad realista. En niveles difíciles, sus saltos son cortos, rápidos y tensos.
+    - **Animación y Sonido:** Reproduce un sonido de búho al aparecer y cambia de disfraz para reflejar cada fase de su movimiento (salto, burla, caída).
+    - **Interacción (Destrucción):** Otorga una cantidad de puntos que escala con la dificultad (de 250 en D1 a 450 en D5), recompensando al jugador por el mayor desafío.
+    - **Interacción (Escape / Penalización):** Si el búho se escapa, **penaliza al jugador quitándole una vida**. El escape se comunica con un sonido y la aparición de un sprite de "Calavera".
 - **Resumen de Fin de Partida:**
-    - Muestra un disfraz de "llorando" y un mensaje con el recuento de búhos abatidos versus los creados.
+    - Muestra un mensaje con el recuento de búhos abatidos.
 
-
-## Boton - Dificultad
+## NPC - Libelula
 ### Que hace?
-- **Función principal:** Gestiona el ajuste del nivel de dificultad del juego.
-- **Comportamiento general:**
-    - Solo se muestra en la pantalla de "Opciones". Permanece oculto en todas las demás.
-    - Al aparecer, se divide en dos botones:
-        1.  El sprite original se convierte en el botón para **"Aumentar"** la dificultad y se posiciona a la izquierda.
-        2.  Inmediatamente crea un clon de sí mismo, que se convierte en el botón para **"Disminuir"** la dificultad y se posiciona a la derecha.
-    - **NUEVO:** Se han reposicionado los botones en la parte superior de la pantalla (`y = 70`).
-
-- **Funcionalidad de los botones:**
-    - **Botón Aumentar (+):**
-        - Al hacer clic, incrementa la variable "Dificultad" en 1.
-        - El nivel máximo de dificultad es 5. Si se intenta superar, muestra un mensaje de advertencia.
-    - **Botón Disminuir (-):**
-        - Al hacer clic, reduce la variable "Dificultad" en 1.
-        - El nivel mínimo de dificultad es 1. Si se intenta bajar más, muestra un mensaje de advertencia.
-    - **Feedback:** Después de cada cambio, muestra el nuevo valor de dificultad por un momento.
-
-
-
-## Arma
-### Que hace?
-- Al iniciar el programa (bandera verde), el arma permanece oculta.
-- No aparece en las pantallas de "Inicio" ni de "Fin".
-- Su comportamiento principal se activa únicamente durante el "Juego":
-    - Se hace visible.
-    - **NUEVO:** Se asegura de aparecer siempre en la capa superior (por encima de los enemigos).
-    - Sigue la posición del cursor, pero con un desplazamiento fijo (aparece abajo y a la derecha del puntero).
-    - Siempre apunta en la dirección del mouse.
-    - Al hacer clic con el mouse:
-        - Dispara (crea un clon del sprite "Bala").
-        - Realiza una pequeña animación de retroceso inclinándose.
-        - Espera a que se suelte el botón del mouse antes de volver a su posición original.
+- **Función principal:** Actúa como el enemigo "grunt" más común del juego, con un comportamiento dinámico que escala con la dificultad.
+- **Generación de clones (Spawning):**
+    - **Balance Dinámico:** La **frecuencia de aparición** depende inversamente de la `Dificultad`, creando enjambres mucho más densos en los niveles altos.
+- **Comportamiento del clon:**
+    - Tiene una probabilidad de **1/25 de ser una variante Rara**.
+    - **Movimiento Dinámico:** La **velocidad de vuelo** aumenta con la `Dificultad` siguiendo una curva de raíz cuadrada, proporcionando un escalado de desafío suave.
+    - **Libélula Normal:** Otorga una cantidad de **puntos que escala** con la dificultad (de 100 en D1 a 180 en D5).
+    - **Libélula Rara:** Otorga una gran recompensa en **puntos que escala** con la dificultad (de 500 en D1 a 900 en D5) además de **+1 Vida**.
+    - **Comportamiento Común:** No resta vidas si se escapa y tiene feedback audiovisual completo.
+- **Resumen de Fin de Partida:**
+    - Muestra el recuento de libélulas abatidas.
 
 ## Sprite - Mira
 ### Que hace?
@@ -449,14 +360,102 @@ Deberia ponerse arriba sin ser clickable cuando entro a opciones y centrarse
 
 ## Bala
 ### Que hace?
-- **Función principal:** El sprite original actúa como una "plantilla". La lógica principal se ejecuta en sus clones.
-- **Decisión de diseño:** Se mantiene una única arma para enfocar el gameplay.
+- **Función principal:** El sprite original actúa como una "plantilla" oculta. Su lógica principal se ejecuta en los clones que son creados por el `Arma`. Además de gestionar el proyectil en sí, este sprite también es el responsable de mostrar las estadísticas de precisión al final de la partida.
+- **Contadores de Disparo:**
+    - Al ser creado un clon, incrementa dos contadores clave:
+        1.  `Balas - En cargador`: Para la mecánica de recarga del arma en tiempo real.
+        2.  `Balas disparadas`: Para el cálculo de estadísticas al final de la partida.
+- **Comportamiento del Clon (Proyectil):**
+    - Se posiciona en el `Arma` y se desliza rápidamente hasta la posición del mouse en el momento del disparo.
+    - Activa una `Bandera de disparo` por un breve instante (0.05s) para permitir que los NPCs detecten la colisión.
+    - Al llegar a su destino, reproduce un efecto visual donde se encoge hasta desaparecer y luego se autodestruye.
+- **Reporte de Estadísticas:**
+    - Al recibir el evento `Fin`, el sprite original (no los clones) se hace visible en la pantalla de resumen.
+    - Calcula y muestra un mensaje con la **precisión final del jugador**, usando la fórmula: `(Total de Bajas / Balas Disparadas) * 100`.
+    - Maneja el caso especial de que el jugador no haya disparado en toda la partida.
 
-- **Comportamiento de cada clon (cuando se dispara):**
-    - **NUEVO - Conteo de Disparos:**
-        - Al ser creado, incrementa la variable global `Balas disparadas` en 1. Este contador será usado para el sistema de precisión y la mecánica de recarga.
-    - **Aparición y Trayectoria:**
-        - Se posiciona en el 'Arma' y apunta hacia el mouse.
-        - Se desliza rápidamente hasta el destino, activando la `Bandera de disparo` por un breve momento para permitir la colisión.
-    - **Impacto y desaparición:**
-        - Entra en un bucle donde su tamaño se reduce progresivamente hasta que desaparece, creando un efecto de impacto.
+
+## Botones
+Tengo que refactorizarlos a todos para hacerlos independientes
+de los demas eventos y solo dependan del evento en ejecucion
+a travez de los cambios de fondos
+## Boton - Creditos
+### Que hace?
+- **Función principal:** Actúa como el botón para acceder a la pantalla de "Créditos" desde el menú de inicio.
+- **Comportamiento:**
+    - Permanece oculto al inicio del programa y solo se hace visible en la pantalla de `Inicio`.
+    - Su posición en el menú se calcula dinámicamente, alineándose con los otros botones.
+    - Cuando el jugador hace clic sobre él, reproduce un sonido, emite el `broadcast('Creditos')` para cambiar de pantalla, y se oculta a sí mismo.
+- **Gestión de Estados:**
+    - El botón se asegura de permanecer oculto en todas las demás pantallas del juego para evitar interacciones no deseadas.
+
+## Boton - comenzar
+### Que hace?
+- **Función principal:** Actúa como el botón principal para iniciar una partida desde el menú de inicio.
+- **Comportamiento:**
+    - Permanece oculto al inicio del programa y solo se hace visible en la pantalla de `Inicio`.
+    - Su posición en el menú se calcula dinámicamente usando variables globales, lo que permite un posicionamiento consistente junto a otros botones.
+    - Cuando el jugador hace clic sobre él, reproduce un sonido `pop`, emite el `broadcast('Juego')` para empezar la partida, y se oculta a sí mismo.
+- **Gestión de Estados:**
+    - El botón se asegura de permanecer oculto en todas las demás pantallas del menú (`Opciones`, `Instrucciones`, `Creditos`) para evitar interacciones no deseadas.
+
+## Boton - Dificultad
+### Que hace?
+- **Función principal:** Gestiona el ajuste del nivel de dificultad del juego.
+- **Comportamiento general:**
+    - Solo se muestra en la pantalla de "Opciones". Permanece oculto en todas las demás.
+    - Al aparecer, se divide en dos botones:
+        1.  El sprite original se convierte en el botón para **"Aumentar"** la dificultad y se posiciona a la izquierda.
+        2.  Inmediatamente crea un clon de sí mismo, que se convierte en el botón para **"Disminuir"** la dificultad y se posiciona a la derecha.
+    - **NUEVO:** Se han reposicionado los botones en la parte superior de la pantalla (`y = 70`).
+
+- **Funcionalidad de los botones:**
+    - **Botón Aumentar (+):**
+        - Al hacer clic, incrementa la variable "Dificultad" en 1.
+        - El nivel máximo de dificultad es 5. Si se intenta superar, muestra un mensaje de advertencia.
+    - **Botón Disminuir (-):**
+        - Al hacer clic, reduce la variable "Dificultad" en 1.
+        - El nivel mínimo de dificultad es 1. Si se intenta bajar más, muestra un mensaje de advertencia.
+    - **Feedback:** Después de cada cambio, muestra el nuevo valor de dificultad por un momento.
+
+
+
+## Boton - Inicio
+### Que hace?
+- **Función principal:** Actúa como el botón universal para "Volver al Menú Principal" desde cualquier pantalla secundaria del juego.
+- **Comportamiento:**
+    - Se muestra durante las pantallas de `Juego`, `Fin`, `Opciones`, y las nuevas pantallas de `Instrucciones` y `Creditos`.
+    - Cuando el jugador hace clic en él, emite el `broadcast('Inicio')` para regresar al menú principal.
+- **Gestión de Estados:**
+    - Permanece oculto en la pantalla de `Inicio` para evitar redundancia y bucles.
+
+## Boton - Instrucciones
+### Que hace?
+- **Función principal:** Actúa como el botón para acceder a la pantalla de "Instrucciones" o "Cómo Jugar" desde el menú de inicio.
+- **Comportamiento:**
+    - Permanece oculto al inicio del programa y solo se hace visible en la pantalla de `Inicio`.
+    - Su posición en el menú se calcula dinámicamente, alineándose con los otros botones de la interfaz.
+    - Cuando el jugador hace clic sobre él, reproduce un sonido, emite el `broadcast('Instrucciones')` para cambiar de pantalla, y se oculta a sí mismo.
+- **Gestión de Estados:**
+    - Se asegura de permanecer oculto en todas las demás pantallas del juego para evitar interacciones no deseadas.
+
+## Boton - Jugar de Nuevo
+### Que hace?
+- **Función principal:** Actúa como el botón para reiniciar la partida inmediatamente desde la pantalla de resultados finales.
+- **Comportamiento:**
+    - Permanece oculto durante la mayor parte del juego.
+    - Se hace visible únicamente en la pantalla de `Fin`, posicionado para un fácil acceso.
+    - Cuando el jugador hace clic sobre él, reproduce un sonido, emite el `broadcast('Juego')` para lanzar una nueva partida, y se oculta a sí mismo.
+- **Gestión de Estados:**
+    - Se asegura de no ser visible en las pantallas de `Inicio` o durante la partida (`Juego`).
+
+## Boton - Opciones
+### Que hace?
+- **Función principal:** Actúa como el botón para acceder a la pantalla de "Opciones" desde el menú de inicio.
+- **Comportamiento:**
+    - Permanece oculto al inicio del programa y solo se hace visible en la pantalla de `Inicio`.
+    - Su posición en el menú se calcula dinámicamente, alineándose con los otros botones de la interfaz.
+    - Cuando el jugador hace clic sobre él, reproduce un sonido, emite el `broadcast('Opciones')` para cambiar de pantalla, y se oculta a sí mismo.
+- **Gestión de Estados:**
+    - Se asegura de permanecer oculto en todas las demás pantallas del juego (`Juego`, `Instrucciones`, `Creditos`) para evitar interacciones no deseadas.
+

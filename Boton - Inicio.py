@@ -22,3 +22,23 @@ def on_received2():
     while True:
         if sprite.is_mousedown and sprite.touching('mouse'):
             sprite.broadcast(str('Inicio'))
+
+
+
+
+@event.received('Instrucciones')
+def on_received3():
+    sprite.show()
+    while True:
+        if sprite.is_mousedown and sprite.touching('mouse'):
+            sprite.broadcast(str('Inicio'))
+
+
+
+
+@event.received('Creditos')
+def on_received4():
+    sprite.show()
+    while True:
+        if sprite.is_mousedown and sprite.touching('mouse'):
+            sprite.broadcast(str('Inicio'))

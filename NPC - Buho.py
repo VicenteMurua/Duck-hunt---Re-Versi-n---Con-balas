@@ -69,7 +69,7 @@ def on_received1():
     sprite.set_variable('Creacion de buhos', 0)
     sprite.hide()
     while True:
-        time.sleep(float(random.uniform((4 - 0.4 * sprite.get_variable('Dificultad')), ((15 - sprite.get_variable('Dificultad'))) / 2)))
+        time.sleep(float(random.uniform((4.8 - 0.4 * sprite.get_variable('Dificultad')), (4 + 4 / ((1 + math.log(sprite.get_variable('Dificultad'))))))))
         sprite.clone('_myself_')
         v = sprite.get_variable('Creacion de buhos')
         sprite.set_variable('Creacion de buhos', v + 1)
@@ -88,7 +88,7 @@ def on_received2():
     sprite.size = 30
     sprite.show()
     sprite.set_costume('Buho - Llorando')
-    sprite.say(str(str('Haz abatido ') + str(sprite.get_variable('Bajas de buhos'))) + str(str(' de ') + str(sprite.get_variable('Creacion de buhos'))))
+    sprite.say(str(str('Haa abatido ') + str(sprite.get_variable('Bajas de buhos'))) + str(str(' de ') + str(sprite.get_variable('Creacion de buhos'))))
 
 
 
@@ -104,16 +104,16 @@ Distancia_de_buho_final_eje_y = ((sprite.get_property('Bala', 'y') - sprite.y))
 Cuadrado_de_la_distancia_de_buho_final_eje_y = Distancia_de_buho_final_eje_y * Distancia_de_buho_final_eje_y
 Distancia_vectorial_de_buho = math.sqrt((Cuadrado_de_la_distancia_de_buho_final_eje_x + Cuadrado_de_la_distancia_de_buho_final_eje_y))
 while True:
-    if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
+    if not str('J').find(str(sprite.backdrop_index('name')[0])) > -1:
         # not supported yet
 
-    if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
+    if not str('J').find(str(sprite.backdrop_index('name')[0])) > -1:
         sprite.stop_this()
 
     if sprite.get_variable('Bandera de disparo') == 1:
         if sprite.touching('Bala') or Distancia_vectorial_de_buho < 5:
             v = sprite.get_variable('Puntos')
-            sprite.set_variable('Puntos', v + 10)
+            sprite.set_variable('Puntos', v + 250 * ((0.8 + 0.2 * sprite.get_variable('Dificultad'))))
             v = sprite.get_variable('Bajas de buhos')
             sprite.set_variable('Bajas de buhos', v + 1)
             sprite.play('Chirp')
@@ -128,7 +128,7 @@ sprite.x = Destino_aleatorio_en_el_eje_x_de_buho
 sprite.y = sprite.get_variable('Linea de horizonte')
 sprite.size = 30
 sprite.show()
-Velocidad_de_Buho = Velocidad_de_Buho + random.randint(6, 12)
+Velocidad_de_Buho = Velocidad_de_Buho + random.uniform((5 + 5 / sprite.get_variable('Dificultad')), (14 + -1 * sprite.get_variable('Dificultad')))
 Generador_de_gravedad_N(-0.4)
 
 # not supported yet
