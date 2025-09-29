@@ -46,6 +46,7 @@ def on_received1():
     sprite.hide()
     sprite.x = 0
     sprite.y = -180
+    sprite.direction = 90
     # not supported yet
     sprite.set_variable('Bajas de tucanes', 0)
     # not supported yet
@@ -92,17 +93,27 @@ while True:
     if sprite.x > -180:
         sprite.left(15)
         for count in range(2):
-            sprite.y = sprite.y + 25
-            sprite.set_costume('Toucan - Elevación')
-            time.sleep(0.1)
-            sprite.set_costume('Toucan - Medio')
-            time.sleep(0.1)
-            sprite.set_costume('Toucan - Caida')
+            if sprite.touching('Bala') or Distancia_vectorial_tucan < 1:
+                sprite.stop_this()
+
+            else:
+                sprite.y = sprite.y + 30 * ((0.8 + sprite.get_variable('Dificultad') / 5))
+                sprite.set_costume('Toucan - Elevación')
+                time.sleep(0.1)
+                sprite.set_costume('Toucan - Medio')
+                time.sleep(0.1)
+                sprite.set_costume('Toucan - Caida')
+
 
         sprite.right(15)
         sprite.right(15)
         for count2 in range(15):
-            sprite.y = sprite.y + -3
+            if sprite.touching('Bala') or Distancia_vectorial_tucan < 1:
+                sprite.stop_this()
+
+            else:
+                sprite.y = sprite.y + -4 * ((1 + sprite.get_variable('Dificultad') / 10))
+
 
         sprite.left(15)
         time.sleep(0.1)
@@ -123,17 +134,22 @@ while True:
         # not supported yet
 
     else:
-        if -180 > sprite.x:
-            sprite.size = sprite.size + 3
-            sprite.x = sprite.x + 5
+        if sprite.touching('Bala') or Distancia_vectorial_tucan < 1:
+            sprite.stop_this()
 
         else:
-            sprite.x = sprite.x + 3
-            if sprite.touching('edge') and sprite.x > sprite.get_variable('Tope horizontal'):
-                v = sprite.get_variable('Puntos')
-                sprite.set_variable('Puntos', v + 20)
-                sprite.play('Coin')
-                # not supported yet
+            if -180 > sprite.x:
+                sprite.size = sprite.size + 3
+                sprite.x = sprite.x + 5
+
+            else:
+                sprite.x = sprite.x + 3
+                if sprite.touching('edge') and sprite.x > sprite.get_variable('Tope horizontal'):
+                    v = sprite.get_variable('Puntos')
+                    sprite.set_variable('Puntos', v + 20)
+                    sprite.play('Coin')
+                    # not supported yet
+
 
 
 
@@ -159,4 +175,10 @@ while True:
             sprite.set_variable('Bajas de tucanes', v + 1)
             sprite.play('Glass Breaking')
             sprite.clone('Sprite - Calavera')
+            for count3 in range(3):
+                time.sleep(0.1)
+                sprite.set_costume('Toucan - Medio')
+                time.sleep(0.1)
+                sprite.set_costume('Toucan - Medio2')
+
             # not supported yet

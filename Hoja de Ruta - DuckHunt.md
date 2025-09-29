@@ -132,32 +132,6 @@ flowchart TD
     - **Feedback:** La recarga tiene una animación visual y un sonido distintivo, creando una pausa que impide disparar. Al finalizar, resetea el contador de `Balas - En cargador` a 0.
 - **Decisión de Diseño:** El juego se centrará en una única arma.
 
-## NPC - Tucan
-### Que hace?
-- **Función principal:** Actúa como un NPC "sagrado" o "amigo". El objetivo del jugador es **NO dispararle**.
-
-- **Generación de clones (Spawning):**
-    - Crea un nuevo tucán en intervalos de tiempo aleatorios, cuya frecuencia y tamaño dependen de la `Dificultad`.
-    - Lleva un registro de cuántos tucanes se han creado y cuántos han sido "abatidos" por error.
-
-- **Comportamiento de cada tucán (clon):**
-    - **Aparición y Trayectoria:**
-        - Aparece a la izquierda y vuela horizontalmente, con un movimiento ondulatorio de zig-zag.
-    - **Interacción (Penalización):**
-        - Si el jugador le dispara, el tucán se destruye.
-        - Penaliza duramente al jugador: le resta **25 puntos** y le quita **una vida**.
-        - Reproduce un sonido de "cristal roto" para enfatizar el error.
-        - **NUEVO:** Al ser destruido, crea un clon del sprite "Calavera" como un efecto visual adicional de la penalización.
-    - **NUEVO - Interacción (Recompensa):**
-        - Si el tucán logra cruzar la pantalla sano y salvo, **recompensa al jugador con +20 puntos**.
-
-- **Resumen de Fin de Partida:**
-    - Muestra un disfraz de "llorando" y un mensaje con el recuento de tucanes "abatidos" por error.
-
-### Que quiero que haga?
-- **(Prioridad de Pulido)** Añadir un sonido distintivo y "amigable" al aparecer.
-- **(Prioridad de Gameplay)** Mejorar el patrón de movimiento de zig-zag para que se sienta más natural y menos predecible.
-- **(Mejora Opcional)** Añadir un sonido de "recompensa" cuando el tucán escapa exitosamente.
 
 
 
@@ -221,7 +195,7 @@ flowchart TD
 *(La última pasada para asegurar la calidad del producto final)*
 
 - **Balance de Puntuación:**
-    - Jugar varias partidas en diferentes dificultades y ajustar la fórmula del `Puntaje Final` si es necesario para que los valores se sientan justos.
+- 
 - **Organización del Código (Refactorización final):**
     - Revisar todos los sprites y ordenar las variables.
     - Asegurarse de que los nombres de las variables sean claros y consistentes en todo el proyecto.
@@ -259,6 +233,24 @@ flowchart TD
     - **Comportamiento Común:** No resta vidas si se escapa y tiene feedback audiovisual completo.
 - **Resumen de Fin de Partida:**
     - Muestra el recuento de libélulas abatidas.
+
+## NPC - Tucan
+### Que hace?
+- **Función principal:** Actúa como un NPC "sagrado" o "aliado", cuya mecánica principal es una prueba de autocontrol para el jugador.
+- **Generación de clones (Spawning):**
+    - **Balance Dinámico:** Su frecuencia de aparición y tamaño inicial escalan con la `Dificultad`.
+- **Comportamiento del clon:**
+    - **Movimiento Dinámico:** Su patrón de vuelo ondulatorio se vuelve más pronunciado y dramático en dificultades altas.
+    - **Feedback Audiovisual Completo:**
+        - Anuncia su llegada con un sonido distintivo (`Squawk`).
+        - Tiene una animación de "muerte" parpadeante si es destruido.
+        - Emite un sonido de recompensa (`Coin`) si se salva.
+    - **Interacción (Penalización):**
+        - Si el jugador le dispara, le penaliza restándole vidas y una cantidad de **puntos que escala** con la dificultad (de -250 en D1 a -450 en D5).
+    - **Interacción (Recompensa):**
+        - Si logra cruzar la pantalla, recompensa al jugador con una cantidad de **puntos que escala** con la dificultad (de +50 en D1 a +90 en D5).
+- **Resumen de Fin de Partida:**
+    - Muestra un mensaje y un disfraz diferente (feliz o triste) dependiendo del porcentaje de tucanes que el jugador logró salvar.
 
 ## Sprite - Mira
 ### Que hace?
