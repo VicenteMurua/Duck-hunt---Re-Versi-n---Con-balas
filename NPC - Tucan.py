@@ -113,6 +113,7 @@ while True:
 sprite.z_index = 256
 sprite.set_costume('Toucan - Caida')
 sprite.z_index = sprite.z_index-1
+sprite.play('Squawk')
 sprite.show()
 sprite.size = 10 * sprite.get_variable('Dificultad')
 sprite.x = -240
@@ -131,6 +132,7 @@ while True:
             if sprite.touching('edge') and sprite.x > sprite.get_variable('Tope horizontal'):
                 v = sprite.get_variable('Puntos')
                 sprite.set_variable('Puntos', v + 20)
+                sprite.play('Coin')
                 # not supported yet
 
 
