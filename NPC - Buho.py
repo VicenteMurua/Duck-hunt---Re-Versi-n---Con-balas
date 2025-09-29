@@ -47,13 +47,6 @@ def Generador_de_gravedad_N(Valor_de_gravedad):
             Velocidad_de_Buho = Velocidad_de_Buho + Valor_de_gravedad
             sprite.y = sprite.y + Velocidad_de_Buho
 
-        if sprite.get_variable('Linea de horizonte') > sprite.y:
-            v = sprite.get_variable('Vidas totales')
-            sprite.set_variable('Vidas totales', v + -1)
-            sprite.play('Low Boing')
-            sprite.clone('Sprite - Calavera')
-            # not supported yet
-
 
 
 
@@ -88,7 +81,7 @@ def on_received2():
     sprite.size = 30
     sprite.show()
     sprite.set_costume('Buho - Llorando')
-    sprite.say(str(str('Haa abatido ') + str(sprite.get_variable('Bajas de buhos'))) + str(str(' de ') + str(sprite.get_variable('Creacion de buhos'))))
+    sprite.say(str(str('Has abatido ') + str(sprite.get_variable('Bajas de buhos'))) + str(str(' de ') + str(sprite.get_variable('Creacion de buhos'))))
 
 
 
@@ -104,21 +97,28 @@ Distancia_de_buho_final_eje_y = ((sprite.get_property('Bala', 'y') - sprite.y))
 Cuadrado_de_la_distancia_de_buho_final_eje_y = Distancia_de_buho_final_eje_y * Distancia_de_buho_final_eje_y
 Distancia_vectorial_de_buho = math.sqrt((Cuadrado_de_la_distancia_de_buho_final_eje_x + Cuadrado_de_la_distancia_de_buho_final_eje_y))
 while True:
-    if not str('J').find(str(sprite.backdrop_index('name')[0])) > -1:
-        # not supported yet
-
-    if not str('J').find(str(sprite.backdrop_index('name')[0])) > -1:
-        sprite.stop_this()
-
-    if sprite.get_variable('Bandera de disparo') == 1:
-        if sprite.touching('Bala') or Distancia_vectorial_de_buho < 5:
-            v = sprite.get_variable('Puntos')
-            sprite.set_variable('Puntos', v + 250 * ((0.8 + 0.2 * sprite.get_variable('Dificultad'))))
-            v = sprite.get_variable('Bajas de buhos')
-            sprite.set_variable('Bajas de buhos', v + 1)
-            sprite.play('Chirp')
+    if str('J').find(str(sprite.backdrop_index('name')[0])) > -1:
+        if sprite.get_variable('Linea de horizonte') > sprite.y:
+            v = sprite.get_variable('Vidas totales')
+            sprite.set_variable('Vidas totales', v + -1)
+            sprite.play('Low Boing')
+            sprite.clone('Sprite - Calavera')
             # not supported yet
 
+        if sprite.get_variable('Bandera de disparo') == 1:
+            if sprite.touching('Bala') or Distancia_vectorial_de_buho < 5:
+                v = sprite.get_variable('Puntos')
+                sprite.set_variable('Puntos', v + 250 * ((0.8 + 0.2 * sprite.get_variable('Dificultad'))))
+                v = sprite.get_variable('Bajas de buhos')
+                sprite.set_variable('Bajas de buhos', v + 1)
+                sprite.play('Chirp')
+                # not supported yet
+
+
+
+    else:
+        sprite.stop_other()
+        # not supported yet
 
 
 
@@ -148,11 +148,3 @@ while True:
 
     if Velocidad_de_Buho < -4:
         sprite.set_costume('Buho - Caida')
-
-
-
-# not supported yet
-while True:
-    if str('I').find(str(sprite.backdrop_index('name')[0])) > -1 or str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
-        sprite.stop_other()
-        # not supported yet

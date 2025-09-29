@@ -10,11 +10,11 @@ def on_received():
     sprite.hide()
 
 
-@event.received('Opciones')
-def on_received1():
-    sprite.show()
-
-
 @event.received('Juego')
-def on_received2():
+def on_received1():
     sprite.hide()
+
+
+@event.received('Opciones')
+def on_received2():
+    sprite.show()

@@ -1,4 +1,5 @@
 from mblock import event
+import time
 
 @event.greenflag
 def on_greenflag():
@@ -8,25 +9,18 @@ def on_greenflag():
 @event.received('Fin')
 def on_received():
     sprite.show()
+    time.sleep(0.1)
     sprite.x = 0
     sprite.y = -120
     while True:
-        if sprite.is_mousedown and sprite.touching('mouse'):
-            sprite.play('pop')
-            sprite.broadcast(str('Juego'))
+        if str('F').find(str(sprite.backdrop_index('name')[0])) > -1:
+            if sprite.is_mousedown and sprite.touching('mouse'):
+                sprite.play('pop')
+                sprite.broadcast(str('Juego'))
+                sprite.hide()
+                sprite.stop_this()
+
+
+        else:
             sprite.hide()
             sprite.stop_this()
-
-
-
-
-@event.received('Juego')
-def on_received1():
-    sprite.hide()
-    sprite.stop_other()
-
-
-@event.received('Inicio')
-def on_received2():
-    sprite.hide()
-    sprite.stop_other()

@@ -10,7 +10,7 @@ Este proyecto, nacido como un trabajo para el profesorado de educación tecnoló
 - [🚀 Sobre el Proyecto](#-sobre-el-proyecto)
 - [✨ Características Principales](#-características-principales)
 - [🎮 Cómo Jugar](#-cómo-jugar)
-- [🕹️ Los Bichos y Sus Roles Estratégicos](#️-los-bichos-y-sus-roles-estratégicos)
+- [🕹️ Sprites y Sus Roles Estratégicos](#️-sprites-y-sus-roles-estratégicos)
 - [🔧 Instalación](#-instalación)
 - [📝 Notas del Autor](#-notas-del-autor)
 - [📄 Licencia](#-licencia)
@@ -31,34 +31,39 @@ Este proyecto, nacido como un trabajo para el profesorado de educación tecnoló
 ## ✨ Características Principales
 
 - **Ambientación Desértica:** Sumérgete en un escenario árido donde cada criatura se recorta contra el cielo azul.
-- **Múltiples Tipos de "Bichos":** Enfréntate a tres criaturas aéreas, cada una con un comportamiento, rol y nivel de amenaza únicos.
-- **Jerarquía de Amenazas:** No todos los objetivos son iguales. Aprende a priorizar al **Búho del desierto** para proteger tus vidas.
-- **Mecánica de Criatura Sagrada:** ¡No dispares a todo lo que se mueve! El **Tucán exótico** es un aliado. Dispararle te penalizará duramente, pero protegerlo te recompensará.
+- **Jerarquía de Amenazas:** No todos los objetivos son iguales. Aprende a priorizar al **Búho** para proteger tus vidas y a no dispararle al **Tucán** para evitar penalizaciones.
+- **Balanceo Dinámico:** La velocidad, frecuencia de aparición y recompensa de puntos de todos los enemigos escalan con el nivel de dificultad, ofreciendo una curva de desafío justa y creciente.
+- **Sistema de Recarga Táctica:** Gestiona tu cargador de 6 balas con una recarga automática o **manual (tecla 'R')** que crea ventanas de vulnerabilidad y recompensa la planificación.
 - **Sistema de Vidas y Recompensas:** Comienzas con 3 vidas, pero puedes ganar más gracias a la rara y brillante **Libélula Dorada**.
-- **Múltiples Condiciones de Fin de Partida:** La partida puede terminar por el calor del mediodía (falta de tiempo), por quedarte sin vidas, o al alcanzar la gloriosa victoria por puntos.
-- **Puntuación Final Basada en Eficiencia:** Tu score final no solo depende de los puntos brutos, sino de tu dificultad, las vidas restantes y el tiempo utilizado.
+- **Múltiples Condiciones de Fin de Partida:** La partida puede terminar por el calor del mediodía (falta de tiempo), por quedarte sin vidas, o al alcanzar la gloriosa victoria.
+- **Interfaz de Juego Completa (HUD):** Monitoriza en tiempo real tu tiempo restante, vidas, munición actual y el progreso hacia tu objetivo de victoria.
 
 ---
 
 ## 🎮 Cómo Jugar
 
-1.  **El Objetivo:** Sobrevive bajo el sol del desierto y consigue la mayor puntuación posible. La partida termina si te quedas sin tiempo, sin vidas, o si alcanzas los 500 puntos.
-2.  **Los Controles:** Mueve el mouse para apuntar y haz clic para disparar.
+1.  **El Objetivo:** ¡**Derrota a 20 libélulas** para ganar la partida! También puedes perder si se agota el tiempo o te quedas sin vidas.
+2.  **Los Controles:**
+    - **APUNTAR:** Mueve el Ratón
+    - **DISPARAR:** Haz Clic
+    - **RECARGA TÁCTICA:** Pulsa la tecla 'R'
 3.  **Identifica a los Bichos:**
-    - 🎯 **Libélula (Enjambre del Oasis):** Tu principal fuente de puntos. ¡Cuidado con su variante dorada, que te dará una vida extra!
-    - 🦉 **Búho (Depredador Nocturno Extraviado):** Es rápido y su movimiento es impredecible. Si dejas que se escape, **perderás una vida**. ¡Derríbalo a toda costa!
-    - 🦜 **Tucán (Espíritu del Oasis):** **¡NO LE DISPARES!** Es un aliado sagrado. Si le aciertas por error, perderás puntos y una vida. Si lo dejas cruzar el cielo sano y salvo, te recompensará.
+    - 🎯 **Libélula (Objetivo Principal):** Tu objetivo para ganar. ¡Cuidado con su variante dorada, que te dará una vida extra!
+    - 🦉 **Búho (Amenaza Prioritaria):** Si dejas que se escape, **perderás una vida**. ¡Derríbalo a toda costa!
+    - 🦜 **Tucán (Aliado Sagrado):** **¡NO LE DISPARES!** Si le aciertas, perderás puntos y una vida. Si lo dejas cruzar la pantalla, te recompensará.
 
 ---
 
-## 🕹️ Los Bichos y Sus Roles Estratégicos
+## 🕹️ Sprites y Sus Roles Estratégicos
 
-- **Fondo (El Desierto):** Es el cerebro del juego. Controla los estados (Inicio, Juego, Fin), gestiona las variables globales como el tiempo, las vidas y los puntos, y determina las condiciones de victoria o derrota.
-- **Arma y Bala (El Cazador):** Tu conexión con el juego. El arma sigue al mouse y la bala es la encargada de interactuar con el mundo.
-- **Libélula (La Plaga):** El enemigo más común. Fácil de abatir, pero su recompensa es menor. Su variante dorada puede cambiar el curso de la partida.
-- **Búho (La Amenaza):** El enemigo más peligroso. Su movimiento con gravedad lo hace difícil de predecir y su capacidad de quitar vidas lo convierte en el objetivo de mayor prioridad.
-- **Tucán (El Dilema):** No es un enemigo, es una prueba. Obliga al jugador a dejar de disparar por reflejo y a tomar decisiones conscientes.
-- **Corazones y Calaveras (La Interfaz Viva):** No son solo un contador. Son un sistema visual dinámico que muestra tus aciertos (ganando corazones) y tus errores (con calaveras que son cicatrices permanentes de tus fallos).
+- **Fondo (El Desierto):** Es el cerebro del juego. Controla los estados, gestiona las variables globales y determina las condiciones de victoria o derrota (tiempo, vidas, o las 20 libélulas).
+- **Arma:** Tu herramienta principal. Gestiona el disparo, el contador de balas en el cargador y la **mecánica de recarga** (automática y manual).
+- **Bala:** El proyectil y el **registrador de estadísticas**. Cada clon de bala es un disparo, pero el sprite original se encarga de calcular y mostrar tu **precisión final**.
+- **Búho (La Amenaza):** El enemigo más peligroso. Su movimiento con gravedad y su capacidad de quitar vidas lo convierten en el objetivo de mayor prioridad.
+- **Tucán (El Dilema):** No es un enemigo, es una prueba de autocontrol. Obliga al jugador a pensar antes de disparar.
+- **Libélula (El Objetivo):** El enemigo más común y la clave para la victoria.
+- **Corazones y Calaveras (La Interfaz Viva):** Un sistema visual dinámico que muestra tus vidas actuales y las cicatrices permanentes de tus errores.
+- **Contadores de Interfaz (El HUD):** Un conjunto de sprites dedicados a mostrar en tiempo real el **Temporizador**, la **Munición en el Cargador** y tu **Progreso de Bajas de Libélulas**.
 
 ---
 

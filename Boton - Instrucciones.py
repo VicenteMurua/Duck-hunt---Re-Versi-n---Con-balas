@@ -24,17 +24,25 @@ def on_received():
 
 @event.received('Opciones')
 def on_received1():
-    sprite.hide()
     sprite.stop_other()
+    sprite.hide()
 
 
 @event.received('Juego')
 def on_received2():
-    sprite.hide()
     sprite.stop_other()
+    sprite.hide()
 
 
 @event.received('Creditos')
 def on_received3():
+    sprite.stop_other()
     sprite.hide()
+
+
+@event.received('Instrucciones')
+def on_received4():
+    sprite.show()
+    sprite.x = 0
+    sprite.y = 160
     sprite.stop_other()

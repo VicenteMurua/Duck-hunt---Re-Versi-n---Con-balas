@@ -3,7 +3,6 @@ from mblock import event
 
 def Animaci_C3_B3n_recarga():
     sprite.play('Crank')
-    sprite.set_variable('Balas - En cargador', 0)
     sprite.right(45)
     sprite.set_costume('Arma - Cargada5')
     time.sleep(0.1)
@@ -15,6 +14,7 @@ def Animaci_C3_B3n_recarga():
     time.sleep(0.1)
     sprite.set_costume('Arma - Cargada')
     sprite.left(45)
+    sprite.set_variable('Balas - En cargador', 0)
 
 
 def Animaci_C3_B3n_de_disparo():
@@ -47,33 +47,33 @@ def Animaci_C3_B3n_de_disparo():
 def on_greenflag():
     sprite.hide()
     # not supported yet
-    sprite.set_variable('Cargador - Balas totales', 6)
     # not supported yet
-    sprite.set_variable('Balas - En cargador', 0)
-
-
-@event.received('Inicio')
-def on_received():
-    sprite.hide()
-    sprite.stop_other()
-
-
-@event.received('Fin')
-def on_received1():
-    sprite.hide()
-    sprite.stop_other()
+    sprite.set_variable('Cargador - Balas totales', 6)
 
 
 @event.received('Juego')
-def on_received2():
+def on_received():
+    sprite.set_variable('Balas - En cargador', 0)
     time.sleep(0.1)
     Posicionamiento_de_Arma()
 
 
 @event.received('Juego')
-def on_received3():
+def on_received1():
     time.sleep(0.1)
     Animaci_C3_B3n_de_disparo()
+
+
+@event.received('Inicio')
+def on_received2():
+    sprite.hide()
+    sprite.stop_other()
+
+
+@event.received('Fin')
+def on_received3():
+    sprite.hide()
+    sprite.stop_other()
 
 
 def Posicionamiento_de_Arma():

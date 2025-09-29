@@ -24,7 +24,9 @@ def on_received():
 
 @event.received('Opciones')
 def on_received1():
-    sprite.hide()
+    sprite.show()
+    sprite.x = 0
+    sprite.y = 160
     sprite.stop_other()
 
 

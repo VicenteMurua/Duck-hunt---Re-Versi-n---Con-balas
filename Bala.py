@@ -3,20 +3,21 @@ import time
 
 @event.greenflag
 def on_greenflag():
-    sprite.x = 0
-    sprite.y = -180
+    sprite.x = 230
+    sprite.y = -170
     sprite.hide()
 
 
 @event.received('Inicio')
 def on_received():
-    sprite.x = 0
-    sprite.y = -180
+    sprite.x = 230
+    sprite.y = -170
     sprite.hide()
 
 
 @event.received('Fin')
 def on_received1():
+    sprite.direction = 90
     sprite.x = (sprite.get_variable('Posicion resumen eje x') + 150)
     sprite.y = (sprite.get_variable('Posicion resumen eje y') + -50)
     sprite.size = 30
@@ -32,9 +33,11 @@ def on_received1():
 @event.received('Juego')
 def on_received2():
     sprite.set_draggable(False)
-    sprite.x = 0
-    sprite.y = -180
-    sprite.hide()
+    sprite.direction = 45
+    sprite.x = 230
+    sprite.y = -170
+    sprite.show()
+    sprite.say('¡Hola!', 0)
     sprite.set_variable('Bandera de disparo', 0)
 
 

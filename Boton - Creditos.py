@@ -1,4 +1,5 @@
 from mblock import event
+import time
 
 @event.greenflag
 def on_greenflag():
@@ -24,23 +25,29 @@ def on_received():
 
 @event.received('Creditos')
 def on_received1():
-    sprite.hide()
+    sprite.x = 0
+    sprite.y = 160
+    time.sleep(0.05)
+    sprite.show()
     sprite.stop_other()
 
 
 @event.received('Juego')
 def on_received2():
-    sprite.hide()
+    time.sleep(0.05)
     sprite.stop_other()
+    sprite.hide()
 
 
 @event.received('Opciones')
 def on_received3():
-    sprite.hide()
+    time.sleep(0.05)
     sprite.stop_other()
+    sprite.hide()
 
 
 @event.received('Instrucciones')
 def on_received4():
-    sprite.hide()
+    time.sleep(0.05)
     sprite.stop_other()
+    sprite.hide()
